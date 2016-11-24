@@ -4,10 +4,12 @@ rm -rvf es
 mkdir -p build es
 
 curl -o build/lineas_limite.zip -C - 'http://centrodedescargas.cnig.es/CentroDescargas/equipamiento/lineas_limite.zip'
-unzip -jod build build/lineas_limite.zip recintos_autonomicas*
+unzip -jod build build/lineas_limite.zip recintos_provinciales*
 
-geo2topo -n ccaa=<( \
-    shp2json --encoding utf8 -n build/recintos_autonomicas_inspire_peninbal_etrs89.shp \
+geo2topo -n provincias=<( \
+    shp2json --encoding utf8 -n build/recintos_provinciales_inspire_peninbal_etrs89.shp \
         | ndjson-map '(d.id = d.properties.CODNUT2, delete d.properties, d)') \
   | toposimplify -f -p 0.001 \
+  | topomerge ccaa=provincias -k 'd.id.slice(0, 4)' \
+  | topomerge nation=ccaa \
   > es/25m.json
