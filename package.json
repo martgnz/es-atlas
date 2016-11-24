@@ -1,0 +1,31 @@
+{
+  "name": "es-atlas",
+  "version": "0.1.0",
+  "description": "Pre-built TopoJSON from the IGN",
+  "scripts": {
+    "prepublish": "bash prepublish"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/martgnz/es-atlas.git"
+  },
+  "keywords": [
+    "topojson",
+    "geojson",
+    "shapefile"
+  ],
+  "author": {
+      "name": "Martín González",
+      "url": "https://martingonzalez.net"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "d3-dsv": "^1.0.3",
+    "d3-geo-projection": "^1.2.1",
+    "ndjson-cli": "^0.3.0",
+    "shapefile": "^0.5.9",
+    "topojson": "^2.0.0",
+    "topojson-client": "^2.1.0",
+    "topojson-simplify": "^2.0.0"
+  }
+}

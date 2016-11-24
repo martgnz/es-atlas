@@ -1,2 +1,2 @@
-# spain-atlas
+# es-atlas
 Pre-built TopoJSON from the IGN.
