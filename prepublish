@@ -8,8 +8,8 @@ unzip -jod build build/lineas_limite.zip recintos_provinciales*
 
 geo2topo -n provincias=<( \
     shp2json --encoding utf8 -n build/recintos_provinciales_inspire_peninbal_etrs89.shp \
-        | ndjson-map '(d.id = d.properties.NATCODE.slice(4, 6), d.properties.uniq = d.properties.NATCODE.slice(2, 6), d)') \
+        | ndjson-map '(d.id = d.properties.NATCODE.slice(2, 6), delete d.properties, d)') \
   | toposimplify -f -p 0.001 \
-  | topomerge ccaa=provincias -k 'd.properties.uniq.slice(0, 2)' \
+  | topomerge ccaa=provincias -k 'd.id.slice(0, 2)' \
   | topomerge nation=ccaa \
   > es/25m.json
