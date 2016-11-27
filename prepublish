@@ -8,11 +8,11 @@ unzip -jod build build/lineas_limite.zip recintos_municipales* recintos_provinci
 
 geo2topo -q 1e5 -n provincias=<( \
     shp2json --encoding utf8 -n build/recintos_provinciales_inspire_peninbal_etrs89.shp \
-      | ndjson-map '(d.id = d.properties.NATCODE.slice(2, 6), delete d.properties, d)'
+      | ndjson-map '(d.id = d.properties.NATCODE.slice(4, 6), d)'
     shp2json --encoding utf8 -n build/recintos_provinciales_inspire_canarias_wgs84.shp \
-        | ndjson-map '(d.id = d.properties.NATCODE.slice(2, 6), delete d.properties, d)') \
+      | ndjson-map '(d.id = d.properties.NATCODE.slice(4, 6), d)') \
   | toposimplify -f -p 0.0001 \
-  | topomerge ccaa=provincias -k 'd.id.slice(0, 2)' \
+  | topomerge ccaa=provincias -k 'd.properties.NATCODE.slice(2, 4)' \
   | topomerge nation=ccaa \
   > es/25m_provincias.json
 
@@ -20,7 +20,7 @@ geo2topo -q 1e5 -n municipios=<( \
     shp2json --encoding utf8 -n build/recintos_municipales_inspire_peninbal_etrs89.shp \
       | ndjson-map '(d.id = d.properties.NATCODE.slice(2, 10), delete d.properties, d)'
     shp2json --encoding utf8 -n build/recintos_municipales_inspire_canarias_wgs84.shp \
-        | ndjson-map '(d.id = d.properties.NATCODE.slice(2, 10), delete d.properties, d)') \
+      | ndjson-map '(d.id = d.properties.NATCODE.slice(2, 10), delete d.properties, d)') \
   | toposimplify -f -p 0.0001 \
   | topomerge provincias=municipios -k 'd.id.slice(0, 4)' \
   | topomerge ccaa=provincias -k 'd.id.slice(0, 2)' \
