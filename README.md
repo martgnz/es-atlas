@@ -3,10 +3,57 @@
 This repository provides a simple script to generate TopoJSON files from the [Spanish National Geographic Institute’s](http://www.ign.es/ign/main/index.do) [National Reference Geographic Equipment](http://centrodedescargas.cnig.es/CentroDescargas/equipamiento.do?method=mostrarEquipamiento) vector data.
 
 ## Usage
+In a browser (using [d3-geo](https://github.com/d3/d3-geo) and Canvas):
 
-Clone or download the repo, start a terminal and run `npm install` in the folder. This command will run the script and move the generated files to the `es` folder and the build files to the `build` folder.
+```html
+<!DOCTYPE html>
+<canvas width="960" height="500"></canvas>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://d3js.org/topojson.v2.min.js"></script>
+<script src="https://unpkg.com/d3-composite-projections@1.0.2"></script>
+<script>
 
-If you need to adjust the simplification or another parameter you can change the `prepublish` script and run `npm install` again. The TopoJSONs will be generated again.
+var context = d3.select("canvas").node().getContext("2d"),
+    path = d3.geoPath(d3.geoConicConformalSpain(), context);
+
+d3.json("https://www.martingonzalez.net/es-25m-provincias.v1.json", function(error, es) {
+  if (error) throw error;
+
+  context.beginPath();
+  path(topojson.mesh(es));
+  context.stroke();
+});
+
+</script>
+```
+
+In Node (using [d3-geo](https://github.com/d3/d3-geo) and [node-canvas](https://github.com/Automattic/node-canvas)):
+
+```js
+var fs = require("fs"),
+    d3_composite = require("d3-composite-projections"),
+    d3 = require("d3-geo"),
+    topojson = require("topojson-client"),
+    Canvas = require("canvas"),
+    es = require("./node_modules/es-atlas/es/25m_provincias.json");
+
+var canvas = new Canvas(960, 500),
+    context = canvas.getContext("2d"),
+    path = d3.geoPath(d3_composite.geoConicConformalSpain(), context);
+
+context.beginPath();
+path(topojson.mesh(es));
+context.stroke();
+
+canvas.pngStream().pipe(fs.createWriteStream("preview.png"));
+```
+
+I highly recommend using Roger Veciana’s [d3-composite-projections](https://github.com/rveciana/d3-composite-projections) with these files. Using a `geoConicConformalSpain` projection will ensure that the Canary Islands are painted closer to the mainland and even add a border to mark the projection zone.
+
+## Generating the files
+Clone or download the repo, start a terminal and run `npm install` from the folder. This command will run the script and move the generated files to the `es` folder.
+
+If you need to make further adjustments you can change the `prepublish` script and run `npm install` again. 
 
 ## File Reference
 ...
