@@ -1,7 +1,7 @@
 {
   "name": "es-atlas",
   "version": "0.1.0",
-  "description": "Pre-built TopoJSON from the IGN",
+  "description": "Pre-built TopoJSON from the CNIG",
   "scripts": {
     "prepublish": "bash prepublish"
   },
@@ -12,7 +12,8 @@
   "keywords": [
     "topojson",
     "geojson",
-    "shapefile"
+    "shapefile",
+    "spain"
   ],
   "author": {
       "name": "Martín González",
