@@ -4,7 +4,7 @@
   "description": "Pre-built TopoJSON from the CNIG",
   "scripts": {
     "prepublish": "bash prepublish",
-    "postpublish": "VERSION=`node -e 'console.log(require(\"./package.json\").version)'`; git push && git push --tags && cd ../martgnz.github.io && git pull && cp -v ../es-atlas/es/25m_provincias.json es-25m-provincias.v1.json && cp -v ../es-atlas/es/25m_municipios.json es-25m-municipios.v1.json && git add es-25m-provincias.v1.json es-25m-municipios.v1.json && git commit -m \"es-atlas ${VERSION}\" && git push && cd -"
+    "postpublish": "VERSION=`node -e 'console.log(require(\"./package.json\").version)'`; git push && git push --tags && cd ../martgnz.github.io && git pull && cp -v ../es-atlas/es/es_provinces.json es-provinces.v1.json && cp -v ../es-atlas/es/es_municipalities.json es-municipalities.v1.json && git add es-provinces.v1.json es-municipalities.v1.json && git commit -m \"es-atlas ${VERSION}\" && git push && cd -"
   },
   "repository": {
     "type": "git",
