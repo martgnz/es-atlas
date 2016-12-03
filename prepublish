@@ -1,28 +1,84 @@
 #!/bin/bash
 
+# Simplification
+SP=0.0001
+
+# Quantization
+QU=1e4
+
 rm -rvf es
 mkdir -p build es
 
 curl -o build/lineas_limite.zip -C - 'http://centrodedescargas.cnig.es/CentroDescargas/equipamiento/lineas_limite.zip'
 unzip -jod build build/lineas_limite.zip recintos_municipales* recintos_provinciales*
 
-geo2topo -q 1e5 -n provincias=<( \
+geo2topo -n provincias=<( \
     shp2json --encoding utf8 -n build/recintos_provinciales_inspire_peninbal_etrs89.shp \
       | ndjson-map '(d.id = d.properties.NATCODE.slice(4, 6), d)'
     shp2json --encoding utf8 -n build/recintos_provinciales_inspire_canarias_wgs84.shp \
       | ndjson-map '(d.id = d.properties.NATCODE.slice(4, 6), d)') \
-  | toposimplify -f -p 0.0001 \
+  | toposimplify -f -p $SP \
   | topomerge ccaa=provincias -k 'd.properties.NATCODE.slice(2, 4)' \
   | topomerge nation=ccaa \
   > es/25m_provincias.json
 
-geo2topo -q 1e5 -n municipios=<( \
+geo2topo -n municipios=<( \
     shp2json --encoding utf8 -n build/recintos_municipales_inspire_peninbal_etrs89.shp \
       | ndjson-map '(d.id = d.properties.NATCODE.slice(6, 11), d)'
     shp2json --encoding utf8 -n build/recintos_municipales_inspire_canarias_wgs84.shp \
       | ndjson-map '(d.id = d.properties.NATCODE.slice(6, 11), d)') \
-  | toposimplify -f -p 0.0001 \
+  | toposimplify -f -p $SP \
   | topomerge provincias=municipios -k 'd.properties.NATCODE.slice(4, 6)' \
   | topomerge ccaa=municipios -k 'd.properties.NATCODE.slice(2, 4)' \
   | topomerge nation=ccaa \
-> es/25m_municipios.json
+  > es/25m_municipios.json
+
+# Inspired by: https://bl.ocks.org/mbostock/39b34968ad5eab65de1d7da81f78bb27
+# Re-compute the topology as a further optimization.
+# This consolidates unique sequences of arcs.
+# https://github.com/topojson/topojson-simplify/issues/4
+topo2geo -n \
+  < es/25m_provincias.json \
+  provincias=es/provincias.json \
+  ccaa=es/ccaa.json \
+  nation=es/nation.json
+
+geo2topo -n \
+  provincias=<( \
+      cat es/provincias.json \
+        | ndjson-map '(delete d.properties, d)') \
+  ccaa=<( \
+      cat es/ccaa.json \
+        | ndjson-map '(delete d.properties, d)') \
+  nation=<( \
+      cat es/nation.json \
+        | ndjson-map '(delete d.properties, d)') \
+  | topoquantize $QU \
+  > es/25m_provincias.json
+
+rm es/provincias.json es/ccaa.json es/nation.json
+
+topo2geo -n \
+  < es/25m_municipios.json \
+  municipios=es/municipios.json \
+  provincias=es/provincias.json \
+  ccaa=es/ccaa.json \
+  nation=es/nation.json
+  
+geo2topo -n \
+  municipios=<( \
+      cat es/municipios.json \
+        | ndjson-map '(delete d.properties, d)') \
+  provincias=<( \
+      cat es/provincias.json \
+        | ndjson-map '(delete d.properties, d)') \
+  ccaa=<( \
+      cat es/ccaa.json \
+        | ndjson-map '(delete d.properties, d)') \
+  nation=<( \
+      cat es/nation.json \
+        | ndjson-map '(delete d.properties, d)') \
+  | topoquantize $QU \
+  > es/25m_municipios.json
+
+rm es/municipios.json es/provincias.json es/ccaa.json es/nation.json
