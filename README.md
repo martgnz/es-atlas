@@ -65,7 +65,7 @@ If you need to make further adjustments (simplification, quantization) you can c
 
 A TopoJSON which contains four objects: *municipalities*, *provinces*, *autonomous regions* and *nation*. Every city, province and region has its corresponding [National Statistics Institute](http://www.ine.es/en/welcome.shtml) identifier, so it's easy to get started. 
 
-<a href="#es/municipalities.json_municipalities" name="es/es_municipalities.json_municipalities">#</a> *es*.objects.<b>municipalities</b>
+<a href="#es/municipalities.json_municipalities" name="es/municipalities.json_municipalities">#</a> *es*.objects.<b>municipalities</b>
 
 <img src="https://cloud.githubusercontent.com/assets/1236790/20868824/69a60934-ba65-11e6-8591-ddcc1e93b157.png" width="480" height="auto">
 
