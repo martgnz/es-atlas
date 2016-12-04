@@ -18,13 +18,13 @@ var context = d3.select("canvas").node().getContext("2d"),
     path = d3.geoPath(projection, context);
 
 d3.json("https://martingonzalez.net/es-provinces.v1.json", function(error, es) {
-  if (error) throw error;
+    if (error) throw error;
 
-  context.beginPath();
-  path(topojson.mesh(es));
-  context.stroke();
+    context.beginPath();
+    path(topojson.mesh(es));
+    context.stroke();
   
-  context.stroke(new Path2D(projection.getCompositionBorders()));
+    context.stroke(new Path2D(projection.getCompositionBorders()));
 });
 
 </script>
@@ -41,10 +41,9 @@ var fs = require("fs"),
     Canvas = require("canvas"),
     es = require("./node_modules/es-atlas/es/es_provinces.json");
 
-var projection = d3_composite.geoConicConformalSpain();
-
 var canvas = new Canvas(960, 500),
     context = canvas.getContext("2d"),
+    projection = d3_composite.geoConicConformalSpain(),
     path = d3.geoPath(projection, context);
 
 context.beginPath();
