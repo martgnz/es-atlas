@@ -14,17 +14,17 @@ In a browser (using [d3-geo](https://github.com/d3/d3-geo) and Canvas):
 <script>
 
 var context = d3.select("canvas").node().getContext("2d"),
-    projection = d3.geoConicConformalSpain(),
-    path = d3.geoPath(projection, context);
+  projection = d3.geoConicConformalSpain(),
+  path = d3.geoPath(projection, context);
 
 d3.json("https://martingonzalez.net/es-provinces.v1.json", function(error, es) {
-    if (error) throw error;
+  if (error) throw error;
 
-    context.beginPath();
-    path(topojson.mesh(es));
-    context.stroke();
+  context.beginPath();
+  path(topojson.mesh(es));
+  context.stroke();
   
-    context.stroke(new Path2D(projection.getCompositionBorders()));
+  context.stroke(new Path2D(projection.getCompositionBorders()));
 });
 
 </script>
@@ -35,16 +35,16 @@ In Node (using [d3-geo](https://github.com/d3/d3-geo) and [node-canvas](https://
 
 ```js
 var fs = require("fs"),
-    d3_composite = require("d3-composite-projections"),
-    d3 = require("d3-geo"),
-    topojson = require("topojson-client"),
-    Canvas = require("canvas"),
-    es = require("./node_modules/es-atlas/es/es_provinces.json");
+  d3_composite = require("d3-composite-projections"),
+  d3 = require("d3-geo"),
+  topojson = require("topojson-client"),
+  Canvas = require("canvas"),
+  es = require("./node_modules/es-atlas/es/provinces.json");
 
 var canvas = new Canvas(960, 500),
-    context = canvas.getContext("2d"),
-    projection = d3_composite.geoConicConformalSpain(),
-    path = d3.geoPath(projection, context);
+  context = canvas.getContext("2d"),
+  projection = d3_composite.geoConicConformalSpain(),
+  path = d3.geoPath(projection, context);
 
 context.beginPath();
 path(topojson.mesh(es));
@@ -65,7 +65,7 @@ If you need to make further adjustments (simplification, quantization) you can c
 
 A TopoJSON which contains four objects: *municipalities*, *provinces*, *autonomous regions* and *nation*. Every city, province and region has its corresponding [National Statistics Institute](http://www.ine.es/en/welcome.shtml) identifier, so it's easy to get started. 
 
-<a href="#es/es_municipalities.json_municipalities" name="es/es_municipalities.json_municipalities">#</a> *es*.objects.<b>municipalities</b>
+<a href="#es/municipalities.json_municipalities" name="es/es_municipalities.json_municipalities">#</a> *es*.objects.<b>municipalities</b>
 
 <img src="https://cloud.githubusercontent.com/assets/1236790/20868824/69a60934-ba65-11e6-8591-ddcc1e93b157.png" width="480" height="auto">
 

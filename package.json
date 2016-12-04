@@ -1,10 +1,10 @@
 {
   "name": "es-atlas",
   "version": "0.1.0",
-  "description": "Pre-built TopoJSON from the CNIG",
+  "description": "Pre-built TopoJSON from the Spanish National Geographic Institute",
   "scripts": {
     "prepublish": "bash prepublish",
-    "postpublish": "VERSION=`node -e 'console.log(require(\"./package.json\").version)'`; git push && git push --tags && cd ../martgnz.github.io && git pull && cp -v ../es-atlas/es/es_provinces.json es-provinces.v1.json && cp -v ../es-atlas/es/es_municipalities.json es-municipalities.v1.json && git add es-provinces.v1.json es-municipalities.v1.json && git commit -m \"es-atlas ${VERSION}\" && git push && cd -"
+    "postpublish": "VERSION=`node -e 'console.log(require(\"./package.json\").version)'`; git push && git push --tags && cd ../martgnz.github.io && git pull && cp -v ../es-atlas/es/provinces.json es-provinces.v1.json && cp -v ../es-atlas/es/municipalities.json es-municipalities.v1.json && git add es-provinces.v1.json es-municipalities.v1.json && git commit -m \"es-atlas ${VERSION}\" && git push && cd -"
   },
   "repository": {
     "type": "git",

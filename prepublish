@@ -20,7 +20,7 @@ geo2topo -n provinces=<( \
   | toposimplify -f -p $SP \
   | topomerge autonomous_regions=provinces -k 'd.properties.NATCODE.slice(2, 4)' \
   | topomerge nation=autonomous_regions \
-  > es/es_provinces.json
+  > es/provinces.json
 
 geo2topo -n municipalities=<( \
     shp2json --encoding utf8 -n build/recintos_municipales_inspire_peninbal_etrs89.shp \
@@ -31,54 +31,54 @@ geo2topo -n municipalities=<( \
   | topomerge provinces=municipalities -k 'd.properties.NATCODE.slice(4, 6)' \
   | topomerge autonomous_regions=municipalities -k 'd.properties.NATCODE.slice(2, 4)' \
   | topomerge nation=autonomous_regions \
-  > es/es_municipalities.json
+  > es/municipalities.json
 
 # Inspired by: https://bl.ocks.org/mbostock/39b34968ad5eab65de1d7da81f78bb27
 # Re-compute the topology as a further optimization.
 # This consolidates unique sequences of arcs.
 # https://github.com/topojson/topojson-simplify/issues/4
 topo2geo -n \
-  < es/es_provinces.json \
-  provinces=es/provinces.json \
-  autonomous_regions=es/autonomous_regions.json \
-  nation=es/nation.json
+  < es/provinces.json \
+  provinces=es/_provinces.json \
+  autonomous_regions=es/_autonomous_regions.json \
+  nation=es/_nation.json
 
 geo2topo -n \
   provinces=<( \
-      cat es/provinces.json \
+      cat es/_provinces.json \
         | ndjson-map '(delete d.properties, d)') \
   autonomous_regions=<( \
-      cat es/autonomous_regions.json \
+      cat es/_autonomous_regions.json \
         | ndjson-map '(delete d.properties, d)') \
   nation=<( \
-      cat es/nation.json \
+      cat es/_nation.json \
         | ndjson-map '(delete d.properties, d)') \
   | topoquantize $QU \
-  > es/es_provinces.json
+  > es/provinces.json
 
-rm es/provinces.json es/autonomous_regions.json es/nation.json
+rm es/_provinces.json es/_autonomous_regions.json es/_nation.json
 
 topo2geo -n \
-  < es/es_municipalities.json \
-  municipalities=es/municipalities.json \
-  provinces=es/provinces.json \
-  autonomous_regions=es/autonomous_regions.json \
-  nation=es/nation.json
+  < es/municipalities.json \
+  municipalities=es/_municipalities.json \
+  provinces=es/_provinces.json \
+  autonomous_regions=es/_autonomous_regions.json \
+  nation=es/_nation.json
   
 geo2topo -n \
   municipalities=<( \
-      cat es/municipalities.json \
+      cat es/_municipalities.json \
         | ndjson-map '(delete d.properties, d)') \
   provinces=<( \
-      cat es/provinces.json \
+      cat es/_provinces.json \
         | ndjson-map '(delete d.properties, d)') \
   autonomous_regions=<( \
-      cat es/autonomous_regions.json \
+      cat es/_autonomous_regions.json \
         | ndjson-map '(delete d.properties, d)') \
   nation=<( \
-      cat es/nation.json \
+      cat es/_nation.json \
         | ndjson-map '(delete d.properties, d)') \
   | topoquantize $QU \
-  > es/es_municipalities.json
+  > es/municipalities.json
 
-rm es/municipalities.json es/provinces.json es/autonomous_regions.json es/nation.json
+rm es/_municipalities.json es/_provinces.json es/_autonomous_regions.json es/_nation.json
