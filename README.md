@@ -1,4 +1,4 @@
-# Spanish Atlas TopoJSON
+# Spain Atlas TopoJSON
 
 This repository provides a simple script to generate TopoJSON files from the [Spanish National Geographic Institute’s](http://www.ign.es/ign/main/index.do) [National Reference Geographic Equipment](http://centrodedescargas.cnig.es/CentroDescargas/equipamiento.do?method=mostrarEquipamiento) vector data.
 
