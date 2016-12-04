@@ -14,17 +14,21 @@ In a browser (using [d3-geo](https://github.com/d3/d3-geo) and Canvas):
 <script>
 
 var context = d3.select("canvas").node().getContext("2d"),
-    path = d3.geoPath(d3.geoConicConformalSpain(), context);
+    projection = d3.geoConicConformalSpain(),
+    path = d3.geoPath(projection, context);
 
-d3.json("https://www.martingonzalez.net/es-25m-provincias.v1.json", function(error, es) {
+d3.json("es_municipalities.json", function(error, es) {
   if (error) throw error;
 
   context.beginPath();
   path(topojson.mesh(es));
   context.stroke();
+  
+  context.stroke(new Path2D(projection.getCompositionBorders()));
 });
 
 </script>
+
 ```
 
 In Node (using [d3-geo](https://github.com/d3/d3-geo) and [node-canvas](https://github.com/Automattic/node-canvas)):
@@ -35,11 +39,13 @@ var fs = require("fs"),
     d3 = require("d3-geo"),
     topojson = require("topojson-client"),
     Canvas = require("canvas"),
-    es = require("./node_modules/es-atlas/es/25m_provincias.json");
+    es = require("./node_modules/es-atlas/es/es_provinces.json");
+
+var projection = d3_composite.geoConicConformalSpain();
 
 var canvas = new Canvas(960, 500),
     context = canvas.getContext("2d"),
-    path = d3.geoPath(d3_composite.geoConicConformalSpain(), context);
+    path = d3.geoPath(projection, context);
 
 context.beginPath();
 path(topojson.mesh(es));
