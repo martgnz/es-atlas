@@ -17,7 +17,7 @@ var context = d3.select("canvas").node().getContext("2d"),
   projection = d3.geoConicConformalSpain(),
   path = d3.geoPath(projection, context);
 
-d3.json("https://martingonzalez.net/es-provinces.v1.json", function(error, es) {
+d3.json("https://martingonzalez.net/es-municipalities.v1.json", function(error, es) {
   if (error) throw error;
 
   context.beginPath();
@@ -39,7 +39,7 @@ var fs = require("fs"),
   d3 = require("d3-geo"),
   topojson = require("topojson-client"),
   Canvas = require("canvas"),
-  es = require("./node_modules/es-atlas/es/provinces.json");
+  es = require("./node_modules/es-atlas/es/municipalities.json");
 
 var canvas = new Canvas(960, 500),
   context = canvas.getContext("2d"),
@@ -56,7 +56,7 @@ canvas.pngStream().pipe(fs.createWriteStream("preview.png"));
 I highly recommend using Roger Veciana’s [d3-composite-projections](https://github.com/rveciana/d3-composite-projections) with these files. Using a `ConicConformalSpain` projection will ensure that the Canary Islands are painted closer to the mainland and even add a border to mark the projection zone.
 
 ## Generating the files
-Clone or download the repo, start a terminal and run `npm install` from the folder. This command will run the script and move the generated files to the `es` folder.
+Clone or download the repo, start a terminal and run `npm install` in the folder. This command will run the script and move the generated files to the `es` folder.
 
 If you need to make further adjustments (simplification, quantization) you can change the `prepublish` script and run `npm install` again. 
 
