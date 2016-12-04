@@ -61,7 +61,9 @@ Clone or download the repo, start a terminal and run `npm install` from the fold
 If you need to make further adjustments you can change the `prepublish` script and run `npm install` again. 
 
 ## File Reference
-...
+<a href="#es/es_municipalities.json_municipalities" name="es/es_municipalities.json_municipalities">#</a> *es*.objects.<b>municipalities</b>
+
+<img src="https://cloud.githubusercontent.com/assets/1236790/20868784/1c5732da-ba64-11e6-8694-d2539b0a9c32.png" width="480" height="300">
 
 ### Inspiration
 
