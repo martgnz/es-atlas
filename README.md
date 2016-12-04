@@ -61,11 +61,36 @@ Clone or download the repo, start a terminal and run `npm install` from the fold
 If you need to make further adjustments you can change the `prepublish` script and run `npm install` again. 
 
 ## File Reference
-<a href="#es/municipalities.json" name="es/municipalities.json">#</a> <b>es/municipalities.json</b> [<>](https://martingonzalez.net/es_municipalities.v1.json "Source")
+<a href="#es/municipalities.json" name="es/municipalities.json">#</a> <b>es/municipalities.json</b> [<>](https://martingonzalez.net/es-municipalities.v1.json "Source")
 
 <a href="#es/es_municipalities.json_municipalities" name="es/es_municipalities.json_municipalities">#</a> *es*.objects.<b>municipalities</b>
 
 <img src="https://cloud.githubusercontent.com/assets/1236790/20868824/69a60934-ba65-11e6-8591-ddcc1e93b157.png" width="480" height="auto">
+
+<a href="#es/municipalities.json_provinces" name="es/municipalities.json_provinces">#</a> *es*.objects.<b>provinces</b>
+
+<img src="https://cloud.githubusercontent.com/assets/1236790/20868842/012eb12a-ba66-11e6-80f3-f5b0568664ff.png" width="480" height="auto">
+
+<a href="#es/municipalities.json_autonomous_regions" name="es/municipalities.json_autonomous_regions">#</a> *es*.objects.<b>autonomous_regions</b>
+
+<img src="https://cloud.githubusercontent.com/assets/1236790/20868858/72ad886c-ba66-11e6-95eb-e995fa640fc7.png" width="480" height="auto">
+
+<a href="#es/municipalities.json_nation" name="es/municipalities.json_nation">#</a> *es*.objects.<b>nation</b>
+
+<img src="https://cloud.githubusercontent.com/assets/1236790/20868860/871ab75c-ba66-11e6-8517-a7d6e2d5eac8.png" width="480" height="auto">
+
+<a href="#es/provinces.json" name="es/provinces.json">#</a> <b>es/provinces.json</b> [<>](https://martingonzalez.net/es-provinces.v1.json "Source")
+
+<img src="https://cloud.githubusercontent.com/assets/1236790/20868842/012eb12a-ba66-11e6-80f3-f5b0568664ff.png" width="480" height="auto">
+
+<a href="#es/municipalities.json_autonomous_regions" name="es/municipalities.json_autonomous_regions">#</a> *es*.objects.<b>autonomous_regions</b>
+
+<img src="https://cloud.githubusercontent.com/assets/1236790/20868858/72ad886c-ba66-11e6-95eb-e995fa640fc7.png" width="480" height="auto">
+
+<a href="#es/municipalities.json_nation" name="es/municipalities.json_nation">#</a> *es*.objects.<b>nation</b>
+
+<img src="https://cloud.githubusercontent.com/assets/1236790/20868860/871ab75c-ba66-11e6-8517-a7d6e2d5eac8.png" width="480" height="auto">
+
 
 ### Inspiration
 
