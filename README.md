@@ -53,15 +53,17 @@ context.stroke();
 canvas.pngStream().pipe(fs.createWriteStream("preview.png"));
 ```
 
-I highly recommend using Roger Veciana’s [d3-composite-projections](https://github.com/rveciana/d3-composite-projections) with these files. Using a `geoConicConformalSpain` projection will ensure that the Canary Islands are painted closer to the mainland and even add a border to mark the projection zone.
+I highly recommend using Roger Veciana’s [d3-composite-projections](https://github.com/rveciana/d3-composite-projections) with these files. Using a `ConicConformalSpain` projection will ensure that the Canary Islands are painted closer to the mainland and even add a border to mark the projection zone.
 
 ## Generating the files
 Clone or download the repo, start a terminal and run `npm install` from the folder. This command will run the script and move the generated files to the `es` folder.
 
-If you need to make further adjustments you can change the `prepublish` script and run `npm install` again. 
+If you need to make further adjustments (simplification, quantization) you can change the `prepublish` script and run `npm install` again. 
 
 ## File Reference
 <a href="#es/municipalities.json" name="es/municipalities.json">#</a> <b>es/municipalities.json</b> [<>](https://martingonzalez.net/es-municipalities.v1.json "Source")
+
+A TopoJSON which contains four objects: *municipalities*, *provinces*, *autonomous regions* and *nation*. Every city, province and region has its corresponding [National Statistics Institute](http://www.ine.es/en/welcome.shtml) identifier, so it's easy to get started. 
 
 <a href="#es/es_municipalities.json_municipalities" name="es/es_municipalities.json_municipalities">#</a> *es*.objects.<b>municipalities</b>
 
@@ -81,17 +83,7 @@ If you need to make further adjustments you can change the `prepublish` script a
 
 <a href="#es/provinces.json" name="es/provinces.json">#</a> <b>es/provinces.json</b> [<>](https://martingonzalez.net/es-provinces.v1.json "Source")
 
-<a href="#es/provinces.json_provinces" name="es/provinces.json_provinces">#</a> *es*.objects.<b>provinces</b>
-
-<img src="https://cloud.githubusercontent.com/assets/1236790/20868842/012eb12a-ba66-11e6-80f3-f5b0568664ff.png" width="480" height="auto">
-
-<a href="#es/provinces.json_autonomous_regions" name="es/provinces.json_autonomous_regions">#</a> *es*.objects.<b>autonomous_regions</b>
-
-<img src="https://cloud.githubusercontent.com/assets/1236790/20868858/72ad886c-ba66-11e6-95eb-e995fa640fc7.png" width="480" height="auto">
-
-<a href="#es/provinces.json_nation" name="es/provinces.json_nation">#</a> *es*.objects.<b>nation</b>
-
-<img src="https://cloud.githubusercontent.com/assets/1236790/20868860/871ab75c-ba66-11e6-8517-a7d6e2d5eac8.png" width="480" height="auto">
+This file provides the same objects except the municipalities, to keep a smaller footprint on less detailed maps.
 
 
 ### Inspiration
