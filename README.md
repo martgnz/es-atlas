@@ -81,13 +81,15 @@ If you need to make further adjustments you can change the `prepublish` script a
 
 <a href="#es/provinces.json" name="es/provinces.json">#</a> <b>es/provinces.json</b> [<>](https://martingonzalez.net/es-provinces.v1.json "Source")
 
+<a href="#es/provinces.json_provinces" name="es/provinces.json_provinces">#</a> *es*.objects.<b>provinces</b>
+
 <img src="https://cloud.githubusercontent.com/assets/1236790/20868842/012eb12a-ba66-11e6-80f3-f5b0568664ff.png" width="480" height="auto">
 
-<a href="#es/municipalities.json_autonomous_regions" name="es/municipalities.json_autonomous_regions">#</a> *es*.objects.<b>autonomous_regions</b>
+<a href="#es/provinces.json_autonomous_regions" name="es/provinces.json_autonomous_regions">#</a> *es*.objects.<b>autonomous_regions</b>
 
 <img src="https://cloud.githubusercontent.com/assets/1236790/20868858/72ad886c-ba66-11e6-95eb-e995fa640fc7.png" width="480" height="auto">
 
-<a href="#es/municipalities.json_nation" name="es/municipalities.json_nation">#</a> *es*.objects.<b>nation</b>
+<a href="#es/provinces.json_nation" name="es/provinces.json_nation">#</a> *es*.objects.<b>nation</b>
 
 <img src="https://cloud.githubusercontent.com/assets/1236790/20868860/871ab75c-ba66-11e6-8517-a7d6e2d5eac8.png" width="480" height="auto">
 
