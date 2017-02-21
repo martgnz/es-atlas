@@ -46,12 +46,15 @@ topo2geo -n \
 geo2topo -n \
   provinces=<( \
       cat es/_provinces.json \
+        | geoproject -n 'd3.geoConicConformalSpain().translate([480, 300])' \
         | ndjson-map '(delete d.properties, d)') \
   autonomous_regions=<( \
       cat es/_autonomous_regions.json \
+        | geoproject -n 'd3.geoConicConformalSpain().translate([480, 300])' \
         | ndjson-map '(delete d.properties, d)') \
   nation=<( \
       cat es/_nation.json \
+        | geoproject -n 'd3.geoConicConformalSpain().translate([480, 300])' \
         | ndjson-map '(delete d.properties, d)') \
   | topoquantize $QU \
   > es/provinces.json
@@ -68,15 +71,19 @@ topo2geo -n \
 geo2topo -n \
   municipalities=<( \
       cat es/_municipalities.json \
+        | geoproject -n 'd3.geoConicConformalSpain().translate([480, 300])' \
         | ndjson-map '(delete d.properties, d)') \
   provinces=<( \
       cat es/_provinces.json \
+        | geoproject -n 'd3.geoConicConformalSpain().translate([480, 300])' \
         | ndjson-map '(delete d.properties, d)') \
   autonomous_regions=<( \
       cat es/_autonomous_regions.json \
+        | geoproject -n 'd3.geoConicConformalSpain().translate([480, 300])' \
         | ndjson-map '(delete d.properties, d)') \
   nation=<( \
       cat es/_nation.json \
+        | geoproject -n 'd3.geoConicConformalSpain().translate([480, 300])' \
         | ndjson-map '(delete d.properties, d)') \
   | topoquantize $QU \
   > es/municipalities.json
