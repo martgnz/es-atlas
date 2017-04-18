@@ -12,7 +12,6 @@ if [ -n "$1" ]
     if [[ "$1" == "-n" || "$1" == "--with-names" ]]
       then
         NDJSON_ARGS="(d.name=d.properties.NAMEUNIT, delete d.properties, d)"
-        echo 'Working'
     fi
 fi
 
