@@ -1,5 +1,20 @@
 #!/bin/bash
 
+#set path to installed node modules when this script is run without npm 
+PATH=$PATH:./node_modules/.bin
+
+#ndjson args
+NDJSON_ARGS="(delete d.properties, d)"
+
+
+if [ -n "$1" ] 
+  then 
+    if [[ "$1" == "-n" || "$1" == "--with-names" ]]
+      then
+        NDJSON_ARGS="(name = d.properties.NAMEUNIT, delete d.properties, d.properties={}, d.properties.name=name, d)"
+    fi
+fi
+
 # Simplification
 SP=0.0001
 
@@ -46,13 +61,13 @@ topo2geo -n \
 geo2topo -n \
   provinces=<( \
       cat es/_provinces.json \
-        | ndjson-map '(delete d.properties, d)') \
+        | ndjson-map "$NDJSON_ARGS") \
   autonomous_regions=<( \
       cat es/_autonomous_regions.json \
-        | ndjson-map '(delete d.properties, d)') \
+        | ndjson-map "$NDJSON_ARGS") \
   nation=<( \
       cat es/_nation.json \
-        | ndjson-map '(delete d.properties, d)') \
+        | ndjson-map "$NDJSON_ARGS") \
   | topoquantize $QU \
   > es/provinces.json
 
@@ -68,16 +83,16 @@ topo2geo -n \
 geo2topo -n \
   municipalities=<( \
       cat es/_municipalities.json \
-        | ndjson-map '(delete d.properties, d)') \
+        | ndjson-map "$NDJSON_ARGS") \
   provinces=<( \
       cat es/_provinces.json \
-        | ndjson-map '(delete d.properties, d)') \
+        | ndjson-map "$NDJSON_ARGS") \
   autonomous_regions=<( \
       cat es/_autonomous_regions.json \
-        | ndjson-map '(delete d.properties, d)') \
+        | ndjson-map "$NDJSON_ARGS") \
   nation=<( \
       cat es/_nation.json \
-        | ndjson-map '(delete d.properties, d)') \
+        | ndjson-map "$NDJSON_ARGS") \
   | topoquantize $QU \
   > es/municipalities.json
 
