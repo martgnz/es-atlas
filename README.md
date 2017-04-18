@@ -58,7 +58,8 @@ I highly recommend using Roger Veciana’s [d3-composite-projections](https://gi
 ## Generating the files
 Clone or download the repo, start a terminal and run `npm install` in the folder. This command will run the script and move the generated files to the `es` folder.
 
-If you need to make further adjustments (simplification, quantization) you can change the `prepublish` script and run `npm install` again. 
+If you need to make further adjustments (simplification, quantization) you can change the `prepublish` script and run `npm install` again.
+A convenience option was added to the prepublish script in case you want to attach the corresponding feature name (extracted from NAMEUNIT in shp files) to the resulting JSON. In order to do so, run `bash prepublish --with-names` from your terminal.
 
 ## File Reference
 <a href="#es/municipalities.json" name="es/municipalities.json">#</a> <b>es/municipalities.json</b> [<>](https://martingonzalez.net/es-municipalities.v1.json "Source")
