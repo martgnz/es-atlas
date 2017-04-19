@@ -24,7 +24,7 @@ QU=1e4
 rm -rvf es
 mkdir -p build es
 
-curl -o build/lineas_limite.zip -C - 'http://centrodedescargas.cnig.es/CentroDescargas/equipamiento/lineas_limite.zip'
+curl -o build/lineas_limite.zip -C - 'https://media.githubusercontent.com/media/martgnz/es-shp-zip/master/lineas_limite.zip'
 unzip -jod build build/lineas_limite.zip recintos_municipales* recintos_provinciales*
 
 geo2topo -n provinces=<( \
