@@ -58,7 +58,26 @@ I highly recommend using Roger Veciana’s [d3-composite-projections](https://gi
 ## Generating the files
 Clone or download the repo, start a terminal and run `npm install` in the folder. This command will run the script and move the generated files to the `es` folder.
 
-If you need to make further adjustments (simplification, quantization) you can change the `prepublish` script and run `npm install` again. 
+If you need to make further adjustments (simplification, quantization) you can change the `package.json` config and run `npm install` again.
+
+You can also run the script with inline arguments:
+
+```shell
+npm run prepare --es-atlas:simplification=1e3
+```
+
+### Reference
+<a href="#with-names" name="with-names">#</a> <i>with-names</i>
+
+Adds a `name` property to the generated files with the feature name. Set to `false` by default.
+
+<a href="#simplification" name="simplification">#</a> <i>simplification</i>
+
+Removes points to reduce the file size. Set to `1e-4` by default.
+
+<a href="#quantization" name="quantization">#</a> <i>quantization</i>
+
+Removes information by reducing the precision of each coordinate. Set to `1e4` by default.
 
 ## File Reference
 <a href="#es/municipalities.json" name="es/municipalities.json">#</a> <b>es/municipalities.json</b> [<>](https://martingonzalez.net/es-municipalities.v1.json "Source")

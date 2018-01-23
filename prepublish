@@ -1,16 +1,35 @@
 #!/bin/bash
 
-# Simplification
-SP=0.0001
+# Set path to installed node modules to run the script without npm 
+PATH=$PATH:./node_modules/.bin
 
-# Quantization
-QU=1e4
+# Default variables
+NDJSONMAP_ARGS="(delete d.properties, d)"
+SP=$2
+QU=$3
+
+if [ "$1" = true ]; then
+  echo "Adding names to the files"
+  NDJSONMAP_ARGS="(name = d.properties.NAMEUNIT, delete d.properties, d.properties={}, d.properties.name=name, d)"
+fi
+
+echo "Simplification: $SP"
+echo "Quantization: $QU"
 
 rm -rvf es
 mkdir -p build es
 
 curl -o build/lineas_limite.zip -C - 'https://media.githubusercontent.com/media/martgnz/es-shp-zip/master/lineas_limite.zip'
-unzip -jod build build/lineas_limite.zip recintos_municipales* recintos_provinciales*
+unzip -jod build build/lineas_limite.zip recintos_municipales* recintos_provinciales* recintos_autonomicas*
+
+geo2topo -n autonomous_regions=<( \
+    shp2json --encoding utf8 -n build/recintos_autonomicas_inspire_peninbal_etrs89.shp \
+      | ndjson-map '(d.id = d.properties.NATCODE.slice(2, 4), d)'
+    shp2json --encoding utf8 -n build/recintos_autonomicas_inspire_canarias_wgs84.shp \
+      | ndjson-map '(d.id = d.properties.NATCODE.slice(2, 4), d)') \
+  | toposimplify -f -p $SP \
+  | topomerge nation=autonomous_regions \
+  > es/autonomous_regions.json
 
 geo2topo -n provinces=<( \
     shp2json --encoding utf8 -n build/recintos_provinciales_inspire_peninbal_etrs89.shp \
@@ -37,22 +56,36 @@ geo2topo -n municipalities=<( \
 # Re-compute the topology as a further optimization.
 # This consolidates unique sequences of arcs.
 # https://github.com/topojson/topojson-simplify/issues/4
+
 topo2geo -n \
-  < es/provinces.json \
-  provinces=es/_provinces.json \
+  < es/autonomous_regions.json \
   autonomous_regions=es/_autonomous_regions.json \
   nation=es/_nation.json
 
 geo2topo -n \
-  provinces=<( \
-      cat es/_provinces.json \
-        | ndjson-map '(delete d.properties, d)') \
   autonomous_regions=<( \
       cat es/_autonomous_regions.json \
-        | ndjson-map '(delete d.properties, d)') \
+        | ndjson-map "$NDJSONMAP_ARGS") \
   nation=<( \
       cat es/_nation.json \
-        | ndjson-map '(delete d.properties, d)') \
+        | ndjson-map "$NDJSONMAP_ARGS") \
+  | topoquantize $QU \
+  > es/autonomous_regions.json
+
+topo2geo -n \
+  < es/provinces.json \
+  provinces=es/_provinces.json
+
+geo2topo -n \
+  provinces=<( \
+      cat es/_provinces.json \
+        | ndjson-map "$NDJSONMAP_ARGS") \
+  autonomous_regions=<( \
+      cat es/_autonomous_regions.json \
+        | ndjson-map "$NDJSONMAP_ARGS") \
+  nation=<( \
+      cat es/_nation.json \
+        | ndjson-map "$NDJSONMAP_ARGS") \
   | topoquantize $QU \
   > es/provinces.json
 
@@ -68,16 +101,16 @@ topo2geo -n \
 geo2topo -n \
   municipalities=<( \
       cat es/_municipalities.json \
-        | ndjson-map '(delete d.properties, d)') \
+        | ndjson-map "$NDJSONMAP_ARGS") \
   provinces=<( \
       cat es/_provinces.json \
-        | ndjson-map '(delete d.properties, d)') \
+        | ndjson-map "$NDJSONMAP_ARGS") \
   autonomous_regions=<( \
       cat es/_autonomous_regions.json \
-        | ndjson-map '(delete d.properties, d)') \
+        | ndjson-map "$NDJSONMAP_ARGS") \
   nation=<( \
       cat es/_nation.json \
-        | ndjson-map '(delete d.properties, d)') \
+        | ndjson-map "$NDJSONMAP_ARGS") \
   | topoquantize $QU \
   > es/municipalities.json
 
