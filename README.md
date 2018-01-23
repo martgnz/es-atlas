@@ -9,8 +9,8 @@ In a browser (using [d3-geo](https://github.com/d3/d3-geo) and Canvas):
 <!DOCTYPE html>
 <canvas width="960" height="500"></canvas>
 <script src="https://d3js.org/d3.v4.min.js"></script>
-<script src="https://d3js.org/topojson.v2.min.js"></script>
-<script src="https://unpkg.com/d3-composite-projections@1.0.2"></script>
+<script src="https://d3js.org/topojson.v3.min.js"></script>
+<script src="https://unpkg.com/d3-composite-projections@1.2.0"></script>
 <script>
 
 var context = d3.select("canvas").node().getContext("2d"),
