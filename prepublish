@@ -1,21 +1,20 @@
 #!/bin/bash
 
-#set path to installed node modules when this script is run without npm 
+# Set path to installed node modules to run the script without npm 
 PATH=$PATH:./node_modules/.bin
 
-
+# Default variables
 NDJSONMAP_ARGS="(delete d.properties, d)"
-if [ -n "${WITH_NAMES+set}" ]; then
-    if [ $WITH_NAMES = true ]; then
-        NDJSONMAP_ARGS="(name = d.properties.NAMEUNIT, delete d.properties, d.properties={}, d.properties.name=name, d)"
-    fi
+SP=$2
+QU=$3
+
+if [ "$1" = true ]; then
+  echo "Adding names to the files"
+  NDJSONMAP_ARGS="(name = d.properties.NAMEUNIT, delete d.properties, d.properties={}, d.properties.name=name, d)"
 fi
 
-# Simplification
-SP=0.0001
-
-# Quantization
-QU=1e4
+echo "Simplification: $SP"
+echo "Quantization: $QU"
 
 rm -rvf es
 mkdir -p build es
@@ -31,7 +30,6 @@ geo2topo -n autonomous_regions=<( \
   | toposimplify -f -p $SP \
   | topomerge nation=autonomous_regions \
   > es/autonomous_regions.json
-
 
 geo2topo -n provinces=<( \
     shp2json --encoding utf8 -n build/recintos_provinciales_inspire_peninbal_etrs89.shp \
