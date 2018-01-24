@@ -79,12 +79,12 @@ Removes points to reduce the file size. Set to `1e-4` by default.
 
 Removes information by reducing the precision of each coordinate. Set to `1e4` by default.
 
-<a href="#autonomous_regions" name="autonomous_regions">#</a> <i>autonomous_regions</i>
+<a href="#autonomous-regions" name="autonomous-regions">#</a> <i>autonomous-regions</i>
 
 Filters the result by the given `id` of [autonomous regions](http://www.ine.es/en/daco/daco42/codmun/cod_ccaa_en.htm) separated by comma.
 
 ```shell
-npm run prepare --es-atlas:autonomous_regions=09,10,14,04
+npm run prepare --es-atlas:autonomous-regions=09,10,14,04
 ```
 
 ## File Reference
