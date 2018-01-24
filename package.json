@@ -4,7 +4,7 @@
   "description": "Pre-built TopoJSON from the Spanish National Geographic Institute",
   "scripts": {
     "prepare": "bash prepublish $npm_package_config_with_names $npm_package_config_simplification $npm_package_config_quantization $npm_package_config_autonomous_regions",
-    "postpublish": "git push && git push --tags && cd ../martgnz.github.io && git pull && cp -v ../es-atlas/es/provinces.json es-provinces.v1.json && cp -v ../es-atlas/es/municipalities.json es-municipalities.v1.json && cp -v ../es-atlas/es/autonomous_regions.json es-autonomous-regions.v1.json && git add es-autonomous-regions.v1.json es-provinces.v1.json es-municipalities.v1.json && git commit -m \"es-atlas ${npm_package_version}\" && git push && cd -"
+    "postpublish": "git push && git push --tags && cd ../martgnz.github.io && git pull && cp -v ../es-atlas/es/provinces.json es-provinces.v2.json && cp -v ../es-atlas/es/municipalities.json es-municipalities.v2.json && cp -v ../es-atlas/es/autonomous_regions.json es-autonomous-regions.v2.json && git add es-autonomous-regions.v2.json es-provinces.v2.json es-municipalities.v2.json && git commit -m \"es-atlas ${npm_package_version}\" && git push && cd -"
   },
   "config": {
     "with-names": false,

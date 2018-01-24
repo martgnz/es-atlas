@@ -18,7 +18,7 @@ var context = d3.select("canvas").node().getContext("2d"),
   projection = d3.geoConicConformalSpain(),
   path = d3.geoPath(projection, context);
 
-d3.json("https://unpkg.com/es-atlas@0.1.1/es/municipalities.json", function(error, es) {
+d3.json("https://unpkg.com/es-atlas@0.2.0/es/municipalities.json", function(error, es) {
   if (error) throw error;
 
   context.beginPath();
