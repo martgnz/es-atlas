@@ -16,13 +16,7 @@ if [ "$1" = true ]; then
 fi
 
 if [ "$4" != all ]; then
-  CCAA=()
-  IFS=',' read -r -a array <<< $AUTONOMOUS_REGIONS_IDS
-  for id in "${array[@]}";
-  do
-    CCAA+="\"$id\""
-  done
-  NDJSONFILTER_ARGS="${CCAA}.split(' ').includes(d.properties.NATCODE.slice(2, 4))"
+  NDJSONFILTER_ARGS="'${AUTONOMOUS_REGIONS_IDS}'.split(',').includes(d.properties.NATCODE.slice(2, 4))"
 
   # Change default quantization and simplification to have a sharper map
   if [ "$2" = 0.0001 ]; then
