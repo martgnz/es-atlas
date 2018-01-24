@@ -17,7 +17,7 @@ var context = d3.select("canvas").node().getContext("2d"),
   projection = d3.geoConicConformalSpain(),
   path = d3.geoPath(projection, context);
 
-d3.json("https://martingonzalez.net/es-municipalities.v1.json", function(error, es) {
+d3.json("https://unpkg.com/es-atlas@0.1.1/es/municipalities.json", function(error, es) {
   if (error) throw error;
 
   context.beginPath();
@@ -80,7 +80,7 @@ Removes points to reduce the file size. Set to `1e-4` by default.
 Removes information by reducing the precision of each coordinate. Set to `1e4` by default.
 
 ## File Reference
-<a href="#es/municipalities.json" name="es/municipalities.json">#</a> <b>es/municipalities.json</b> [<>](https://martingonzalez.net/es-municipalities.v1.json "Source")
+<a href="#es/municipalities.json" name="es/municipalities.json">#</a> <b>es/municipalities.json</b> [<>](https://unpkg.com/es-atlas/es/municipalities.json "Source")
 
 A TopoJSON which contains four objects: *municipalities*, *provinces*, *autonomous regions* and *nation*. Every city, province and region has its corresponding [National Statistics Institute](http://www.ine.es/en/welcome.shtml) identifier, so it's easy to get started. 
 
@@ -100,11 +100,11 @@ A TopoJSON which contains four objects: *municipalities*, *provinces*, *autonomo
 
 <img src="https://cloud.githubusercontent.com/assets/1236790/20868860/871ab75c-ba66-11e6-8517-a7d6e2d5eac8.png" width="480" height="auto">
 
-<a href="#es/provinces.json" name="es/provinces.json">#</a> <b>es/provinces.json</b> [<>](https://martingonzalez.net/es-provinces.v1.json "Source")
+<a href="#es/provinces.json" name="es/provinces.json">#</a> <b>es/provinces.json</b> [<>](https://unpkg.com/es-atlas/es/provinces.json "Source")
 
 This file provides provinces and autonomous regions, to keep a smaller footprint on less detailed maps.
 
-<a href="#es/autonomous_regions.json" name="es/autonomous_regions.json">#</a> <b>es/autonomous_regions.json</b> [<>](https://martingonzalez.net/es-autonomous-regions.v1.json "Source")
+<a href="#es/autonomous_regions.json" name="es/autonomous_regions.json">#</a> <b>es/autonomous_regions.json</b> [<>](https://unpkg.com/es-atlas/es/autonomous_regions.json "Source")
 
 This file only provides autonomous regions, to keep a smaller footprint on less detailed maps.
 
