@@ -102,7 +102,11 @@ A TopoJSON which contains four objects: *municipalities*, *provinces*, *autonomo
 
 <a href="#es/provinces.json" name="es/provinces.json">#</a> <b>es/provinces.json</b> [<>](https://martingonzalez.net/es-provinces.v1.json "Source")
 
-This file provides the same objects except the municipalities, to keep a smaller footprint on less detailed maps.
+This file provides provinces and autonomous regions, to keep a smaller footprint on less detailed maps.
+
+<a href="#es/autonomous_regions.json" name="es/autonomous_regions.json">#</a> <b>es/autonomous_regions.json</b> [<>](https://martingonzalez.net/es-autonomous-regions.v1.json "Source")
+
+This file only provides autonomous regions, to keep a smaller footprint on less detailed maps.
 
 
 ### Inspiration
