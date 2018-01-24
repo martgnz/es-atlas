@@ -23,7 +23,7 @@ d3.json("https://unpkg.com/es-atlas@0.1.1/es/municipalities.json", function(erro
   context.beginPath();
   path(topojson.mesh(es));
   context.stroke();
-  
+
   context.stroke(new Path2D(projection.getCompositionBorders()));
 });
 
@@ -79,10 +79,18 @@ Removes points to reduce the file size. Set to `1e-4` by default.
 
 Removes information by reducing the precision of each coordinate. Set to `1e4` by default.
 
+<a href="#autonomous_regions" name="autonomous_regions">#</a> <i>autonomous_regions</i>
+
+Filters the result by the given `id` of [autonomous regions](http://www.ine.es/en/daco/daco42/codmun/cod_ccaa_en.htm) separated by comma.
+
+```shell
+npm run prepare --es-atlas:autonomous_regions=09,10,14,04
+```
+
 ## File Reference
 <a href="#es/municipalities.json" name="es/municipalities.json">#</a> <b>es/municipalities.json</b> [<>](https://unpkg.com/es-atlas/es/municipalities.json "Source")
 
-A TopoJSON which contains four objects: *municipalities*, *provinces*, *autonomous regions* and *nation*. Every city, province and region has its corresponding [National Statistics Institute](http://www.ine.es/en/welcome.shtml) identifier, so it's easy to get started. 
+A TopoJSON which contains four objects: *municipalities*, *provinces*, *autonomous regions* and *nation*. Every city, province and region has its corresponding [National Statistics Institute](http://www.ine.es/en/welcome.shtml) identifier, so it's easy to get started.
 
 <a href="#es/municipalities.json_municipalities" name="es/municipalities.json_municipalities">#</a> *es*.objects.<b>municipalities</b>
 
