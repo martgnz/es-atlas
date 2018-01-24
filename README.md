@@ -23,7 +23,7 @@ d3.json("https://unpkg.com/es-atlas@0.1.1/es/municipalities.json", function(erro
   context.beginPath();
   path(topojson.mesh(es));
   context.stroke();
-  
+
   context.stroke(new Path2D(projection.getCompositionBorders()));
 });
 
@@ -79,10 +79,18 @@ Removes points to reduce the file size. Set to `1e-4` by default.
 
 Removes information by reducing the precision of each coordinate. Set to `1e4` by default.
 
+<a href="#autonomous-regions" name="autonomous-regions">#</a> <i>autonomous-regions</i>
+
+Filters the result by the given `id` of [autonomous regions](http://www.ine.es/en/daco/daco42/codmun/cod_ccaa_en.htm) separated by comma.
+
+```shell
+npm run prepare --es-atlas:autonomous-regions=09,10,14,04
+```
+
 ## File Reference
 <a href="#es/municipalities.json" name="es/municipalities.json">#</a> <b>es/municipalities.json</b> [<>](https://unpkg.com/es-atlas/es/municipalities.json "Source")
 
-A TopoJSON which contains four objects: *municipalities*, *provinces*, *autonomous regions* and *nation*. Every city, province and region has its corresponding [National Statistics Institute](http://www.ine.es/en/welcome.shtml) identifier, so it's easy to get started. 
+A TopoJSON which contains four objects: *municipalities*, *provinces*, *autonomous regions* and *border*. Every city, province and region has its corresponding [National Statistics Institute](http://www.ine.es/en/welcome.shtml) identifier, so it's easy to get started.
 
 <a href="#es/municipalities.json_municipalities" name="es/municipalities.json_municipalities">#</a> *es*.objects.<b>municipalities</b>
 
@@ -96,7 +104,7 @@ A TopoJSON which contains four objects: *municipalities*, *provinces*, *autonomo
 
 <img src="https://cloud.githubusercontent.com/assets/1236790/20868858/72ad886c-ba66-11e6-95eb-e995fa640fc7.png" width="480" height="auto">
 
-<a href="#es/municipalities.json_nation" name="es/municipalities.json_nation">#</a> *es*.objects.<b>nation</b>
+<a href="#es/municipalities.json_border" name="es/municipalities.json_border">#</a> *es*.objects.<b>border</b>
 
 <img src="https://cloud.githubusercontent.com/assets/1236790/20868860/871ab75c-ba66-11e6-8517-a7d6e2d5eac8.png" width="480" height="auto">
 
