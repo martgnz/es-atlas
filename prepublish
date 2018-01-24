@@ -20,11 +20,20 @@ if [ "$4" != all ]; then
   IFS=',' read -r -a array <<< $AUTONOMOUS_REGIONS_IDS
   for id in "${array[@]}";
   do
-    CCAA+="\"$id\"",
+    CCAA+="\"$id\""
   done
-  NDJSONFILTER_ARGS="[${CCAA::-1}].includes(d.properties.NATCODE.slice(2, 4))"
+  NDJSONFILTER_ARGS="${CCAA}.split(' ').includes(d.properties.NATCODE.slice(2, 4))"
+
+  # Change default quantization and simplification to have a sharper map
+  if [ "$2" = 0.0001 ]; then
+    SP=1e-5
+  fi
+  if [ "$3" = 10000 ]; then
+    QU=1e5
+  fi
 fi
 
+echo "Autonomous regions: $AUTONOMOUS_REGIONS_IDS"
 echo "Simplification: $SP"
 echo "Quantization: $QU"
 
