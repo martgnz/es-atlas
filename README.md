@@ -119,6 +119,10 @@ This file provides provinces and autonomous regions, to keep a smaller footprint
 
 This file only provides autonomous regions, to keep a smaller footprint on less detailed maps.
 
+### Data license
+
+The shapefiles have a [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/) license. You need to accept the [terms](http://www.ign.es/resources/licencia/Condiciones_licenciaUso_IGN.pdf) before using the files.
+
 ### Inspiration
 
 The original idea and implementation comes from Mike Bostock’s [us-atlas](https://github.com/topojson/us-atlas) and [world-atlas](https://github.com/topojson/world-atlas).
