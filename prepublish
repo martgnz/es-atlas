@@ -32,10 +32,13 @@ echo "Simplification: $SP"
 echo "Quantization: $QU"
 
 rm -rvf es
-mkdir -p build es
+mkdir -p es
 
-curl -o build/lineas_limite.zip -C - 'https://media.githubusercontent.com/media/martgnz/es-shp-zip/master/lineas_limite.zip'
-unzip -jod build build/lineas_limite.zip recintos_municipales* recintos_provinciales* recintos_autonomicas*
+if [ ! -d build ]; then
+  mkdir build
+  curl  "http://centrodedescargas.cnig.es/CentroDescargas/descargaDir" --compressed --data "secuencialDescDir=9000029&aceptCodsLicsDD_0=15" > build/lineas_limite.zip
+  unzip -jod build build/lineas_limite.zip recintos_municipales* recintos_provinciales* recintos_autonomicas*
+fi
 
 geo2topo -n autonomous_regions=<( \
     shp2json --encoding utf8 -n build/recintos_autonomicas_inspire_peninbal_etrs89.shp \
