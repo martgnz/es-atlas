@@ -1,6 +1,6 @@
 {
   "name": "es-atlas",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Pre-built TopoJSON from the Spanish National Geographic Institute",
   "scripts": {
     "prepare": "bash prepublish $npm_package_config_with_names $npm_package_config_simplification $npm_package_config_quantization $npm_package_config_autonomous_regions",
