@@ -21,7 +21,6 @@ const path = d3.geoPath(projection);
 d3.json("https://unpkg.com/es-atlas@0.2.0/es/municipalities.json")
   .then(es => {
     svg
-      .datum(es)
       .append('path')
       .attr('d', path(topojson.mesh(es)))
       .attr('fill', 'none')
