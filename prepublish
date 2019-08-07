@@ -89,10 +89,12 @@ topo2geo -n \
 geo2topo -n \
   autonomous_regions=<( \
       cat es/_autonomous_regions.json \
-        | ndjson-map "$NDJSONMAP_ARGS") \
+        | ndjson-map "$NDJSONMAP_ARGS" \
+        | geoproject -n -r d3=d3-composite-projections 'd3.geoConicConformalSpain()') \
   border=<( \
       cat es/_border.json \
-        | ndjson-map "$NDJSONMAP_ARGS") \
+        | ndjson-map "$NDJSONMAP_ARGS" \
+        | geoproject -n -r d3=d3-composite-projections 'd3.geoConicConformalSpain()') \
   | topoquantize $QU \
   > es/autonomous_regions.json
 
@@ -103,13 +105,16 @@ topo2geo -n \
 geo2topo -n \
   provinces=<( \
       cat es/_provinces.json \
-        | ndjson-map "$NDJSONMAP_ARGS") \
+        | ndjson-map "$NDJSONMAP_ARGS" \
+        | geoproject -n -r d3=d3-composite-projections 'd3.geoConicConformalSpain()') \
   autonomous_regions=<( \
       cat es/_autonomous_regions.json \
-        | ndjson-map "$NDJSONMAP_ARGS") \
+        | ndjson-map "$NDJSONMAP_ARGS" \
+        | geoproject -n -r d3=d3-composite-projections 'd3.geoConicConformalSpain()') \
   border=<( \
       cat es/_border.json \
-        | ndjson-map "$NDJSONMAP_ARGS") \
+        | ndjson-map "$NDJSONMAP_ARGS" \
+        | geoproject -n -r d3=d3-composite-projections 'd3.geoConicConformalSpain()') \
   | topoquantize $QU \
   > es/provinces.json
 
@@ -125,16 +130,20 @@ topo2geo -n \
 geo2topo -n \
   municipalities=<( \
       cat es/_municipalities.json \
-        | ndjson-map "$NDJSONMAP_ARGS") \
+        | ndjson-map "$NDJSONMAP_ARGS" \
+        | geoproject -n -r d3=d3-composite-projections 'd3.geoConicConformalSpain()') \
   provinces=<( \
       cat es/_provinces.json \
-        | ndjson-map "$NDJSONMAP_ARGS") \
+        | ndjson-map "$NDJSONMAP_ARGS" \
+        | geoproject -n -r d3=d3-composite-projections 'd3.geoConicConformalSpain()') \
   autonomous_regions=<( \
       cat es/_autonomous_regions.json \
-        | ndjson-map "$NDJSONMAP_ARGS") \
+        | ndjson-map "$NDJSONMAP_ARGS" \
+        | geoproject -n -r d3=d3-composite-projections 'd3.geoConicConformalSpain()') \
   border=<( \
       cat es/_border.json \
-        | ndjson-map "$NDJSONMAP_ARGS") \
+        | ndjson-map "$NDJSONMAP_ARGS" \
+        | geoproject -n -r d3=d3-composite-projections 'd3.geoConicConformalSpain()') \
   | topoquantize $QU \
   > es/municipalities.json
 
