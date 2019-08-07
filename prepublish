@@ -1,91 +1,141 @@
 #!/bin/bash
 
-# Simplification
-SP=0.0001
+# Set path to installed node modules to run the script without npm
+PATH=$PATH:./node_modules/.bin
 
-# Quantization
-QU=1e4
+# Default variables
+NDJSONMAP_ARGS="(delete d.properties, d)"
+NDJSONFILTER_ARGS='d'
+SP=$2
+QU=$3
+AUTONOMOUS_REGIONS_IDS=$4
+
+if [ "$1" = true ]; then
+  echo "Adding names to the files"
+  NDJSONMAP_ARGS="(name = d.properties.NAMEUNIT, delete d.properties, d.properties={}, d.properties.name=name, d)"
+fi
+
+if [ "$4" != all ]; then
+  NDJSONFILTER_ARGS="'${AUTONOMOUS_REGIONS_IDS}'.split(',').includes(d.properties.NATCODE.slice(2, 4))"
+
+  # Change default quantization and simplification to have a sharper map
+  if [ "$2" = 0.0001 ]; then
+    SP=1e-5
+  fi
+  if [ "$3" = 10000 ]; then
+    QU=1e5
+  fi
+fi
+
+echo "Autonomous regions: $AUTONOMOUS_REGIONS_IDS"
+echo "Simplification: $SP"
+echo "Quantization: $QU"
 
 rm -rvf es
-mkdir -p build es
+mkdir -p es
 
-curl -o build/lineas_limite.zip -C - 'http://centrodedescargas.cnig.es/CentroDescargas/equipamiento/lineas_limite.zip'
-unzip -jod build build/lineas_limite.zip recintos_municipales* recintos_provinciales*
+if [ ! -d build ]; then
+  mkdir build
+  curl  "http://centrodedescargas.cnig.es/CentroDescargas/descargaDir" --compressed --data "secuencialDescDir=9000029&aceptCodsLicsDD_0=15" > build/lineas_limite.zip
+  unzip -jod build build/lineas_limite.zip recintos_municipales* recintos_provinciales* recintos_autonomicas*
+fi
+
+geo2topo -n autonomous_regions=<( \
+    shp2json --encoding utf8 -n build/recintos_autonomicas_inspire_peninbal_etrs89.shp \
+      | ndjson-filter "$NDJSONFILTER_ARGS" \
+      | ndjson-map '(d.id = d.properties.NATCODE.slice(2, 4), d)'
+    shp2json --encoding utf8 -n build/recintos_autonomicas_inspire_canarias_wgs84.shp \
+      | ndjson-filter "$NDJSONFILTER_ARGS" \
+      | ndjson-map '(d.id = d.properties.NATCODE.slice(2, 4), d)') \
+  | toposimplify -f -p $SP \
+  | topomerge border=autonomous_regions \
+  > es/autonomous_regions.json
 
 geo2topo -n provinces=<( \
     shp2json --encoding utf8 -n build/recintos_provinciales_inspire_peninbal_etrs89.shp \
+      | ndjson-filter "$NDJSONFILTER_ARGS" \
       | ndjson-map '(d.id = d.properties.NATCODE.slice(4, 6), d)'
     shp2json --encoding utf8 -n build/recintos_provinciales_inspire_canarias_wgs84.shp \
+      | ndjson-filter "$NDJSONFILTER_ARGS" \
       | ndjson-map '(d.id = d.properties.NATCODE.slice(4, 6), d)') \
   | toposimplify -f -p $SP \
   | topomerge autonomous_regions=provinces -k 'd.properties.NATCODE.slice(2, 4)' \
-  | topomerge nation=autonomous_regions \
+  | topomerge border=autonomous_regions \
   > es/provinces.json
 
 geo2topo -n municipalities=<( \
     shp2json --encoding utf8 -n build/recintos_municipales_inspire_peninbal_etrs89.shp \
+      | ndjson-filter "$NDJSONFILTER_ARGS" \
       | ndjson-map '(d.id = d.properties.NATCODE.slice(6, 11), d)'
     shp2json --encoding utf8 -n build/recintos_municipales_inspire_canarias_wgs84.shp \
+      | ndjson-filter "$NDJSONFILTER_ARGS" \
       | ndjson-map '(d.id = d.properties.NATCODE.slice(6, 11), d)') \
   | toposimplify -f -p $SP \
   | topomerge provinces=municipalities -k 'd.properties.NATCODE.slice(4, 6)' \
   | topomerge autonomous_regions=municipalities -k 'd.properties.NATCODE.slice(2, 4)' \
-  | topomerge nation=autonomous_regions \
+  | topomerge border=autonomous_regions \
   > es/municipalities.json
 
 # Inspired by: https://bl.ocks.org/mbostock/39b34968ad5eab65de1d7da81f78bb27
 # Re-compute the topology as a further optimization.
 # This consolidates unique sequences of arcs.
 # https://github.com/topojson/topojson-simplify/issues/4
+
+topo2geo -n \
+  < es/autonomous_regions.json \
+  autonomous_regions=es/_autonomous_regions.json \
+  border=es/_border.json
+
+geo2topo -n \
+  autonomous_regions=<( \
+      cat es/_autonomous_regions.json \
+        | ndjson-map "$NDJSONMAP_ARGS") \
+  border=<( \
+      cat es/_border.json \
+        | ndjson-map "$NDJSONMAP_ARGS") \
+  | topoquantize $QU \
+  > es/autonomous_regions.json
+
 topo2geo -n \
   < es/provinces.json \
-  provinces=es/_provinces.json \
-  autonomous_regions=es/_autonomous_regions.json \
-  nation=es/_nation.json
+  provinces=es/_provinces.json
 
 geo2topo -n \
   provinces=<( \
       cat es/_provinces.json \
-        | geoproject -n 'd3.geoConicConformalSpain().translate([480, 300])' \
-        | ndjson-map '(delete d.properties, d)') \
+        | ndjson-map "$NDJSONMAP_ARGS") \
   autonomous_regions=<( \
       cat es/_autonomous_regions.json \
-        | geoproject -n 'd3.geoConicConformalSpain().translate([480, 300])' \
-        | ndjson-map '(delete d.properties, d)') \
-  nation=<( \
-      cat es/_nation.json \
-        | geoproject -n 'd3.geoConicConformalSpain().translate([480, 300])' \
-        | ndjson-map '(delete d.properties, d)') \
+        | ndjson-map "$NDJSONMAP_ARGS") \
+  border=<( \
+      cat es/_border.json \
+        | ndjson-map "$NDJSONMAP_ARGS") \
   | topoquantize $QU \
   > es/provinces.json
 
-rm es/_provinces.json es/_autonomous_regions.json es/_nation.json
+rm es/_provinces.json es/_autonomous_regions.json es/_border.json
 
 topo2geo -n \
   < es/municipalities.json \
   municipalities=es/_municipalities.json \
   provinces=es/_provinces.json \
   autonomous_regions=es/_autonomous_regions.json \
-  nation=es/_nation.json
-  
+  border=es/_border.json
+
 geo2topo -n \
   municipalities=<( \
       cat es/_municipalities.json \
-        | geoproject -n 'd3.geoConicConformalSpain().translate([480, 300])' \
-        | ndjson-map '(delete d.properties, d)') \
+        | ndjson-map "$NDJSONMAP_ARGS") \
   provinces=<( \
       cat es/_provinces.json \
-        | geoproject -n 'd3.geoConicConformalSpain().translate([480, 300])' \
-        | ndjson-map '(delete d.properties, d)') \
+        | ndjson-map "$NDJSONMAP_ARGS") \
   autonomous_regions=<( \
       cat es/_autonomous_regions.json \
-        | geoproject -n 'd3.geoConicConformalSpain().translate([480, 300])' \
-        | ndjson-map '(delete d.properties, d)') \
-  nation=<( \
-      cat es/_nation.json \
-        | geoproject -n 'd3.geoConicConformalSpain().translate([480, 300])' \
-        | ndjson-map '(delete d.properties, d)') \
+        | ndjson-map "$NDJSONMAP_ARGS") \
+  border=<( \
+      cat es/_border.json \
+        | ndjson-map "$NDJSONMAP_ARGS") \
   | topoquantize $QU \
   > es/municipalities.json
 
-rm es/_municipalities.json es/_provinces.json es/_autonomous_regions.json es/_nation.json
+rm es/_municipalities.json es/_provinces.json es/_autonomous_regions.json es/_border.json
