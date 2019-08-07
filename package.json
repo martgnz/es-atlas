@@ -28,12 +28,12 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "d3-dsv": "^1.0.3",
-    "d3-geo-projection": "^2.0.1",
-    "ndjson-cli": "^0.3.0",
-    "shapefile": "^0.6.1",
+    "d3-dsv": "^1.1.1",
+    "d3-geo-projection": "^2.7.0",
+    "ndjson-cli": "^0.3.1",
+    "shapefile": "^0.6.6",
     "topojson-client": "^3.0.0",
     "topojson-server": "^3.0.0",
-    "topojson-simplify": "^3.0.0"
+    "topojson-simplify": "^3.0.2"
   }
 }
