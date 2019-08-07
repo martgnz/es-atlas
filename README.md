@@ -4,29 +4,36 @@ This repository provides a simple script to generate TopoJSON files from the [Sp
 
 ## Usage
 
-In a browser (using [d3-geo](https://github.com/d3/d3-geo) and Canvas):
+In a browser (using [d3-geo](https://github.com/d3/d3-geo) and SVG):
 
 ```html
 <!DOCTYPE html>
-<canvas width="960" height="500"></canvas>
-<script src="https://d3js.org/d3.v4.min.js"></script>
+<svg width="960" height="500"></svg>
+<script src="https://d3js.org/d3.v5.min.js"></script>
 <script src="https://d3js.org/topojson.v3.min.js"></script>
 <script src="https://unpkg.com/d3-composite-projections@1.2.0"></script>
 <script>
 
-var context = d3.select("canvas").node().getContext("2d"),
-  projection = d3.geoConicConformalSpain(),
-  path = d3.geoPath(projection, context);
+const svg = d3.select("svg");
+const projection = d3.geoConicConformalSpain();
+const path = d3.geoPath(projection);
 
-d3.json("https://unpkg.com/es-atlas@0.2.0/es/municipalities.json", function(error, es) {
-  if (error) throw error;
+d3.json("https://unpkg.com/es-atlas@0.2.0/es/municipalities.json")
+  .then(es => {
+    svg
+      .datum(es)
+      .append('path')
+      .attr('d', path(topojson.mesh(es)))
+      .attr('fill', 'none')
+      .attr('stroke', 'black');
 
-  context.beginPath();
-  path(topojson.mesh(es));
-  context.stroke();
-
-  context.stroke(new Path2D(projection.getCompositionBorders()));
-});
+    svg
+      .append('path')
+      .attr('d', projection.getCompositionBorders())
+      .attr('fill', 'none')
+      .attr('stroke', 'black');
+  })
+  .catch(err => console.warn(err));
 
 </script>
 ```
@@ -34,17 +41,17 @@ d3.json("https://unpkg.com/es-atlas@0.2.0/es/municipalities.json", function(erro
 In Node (using [d3-geo](https://github.com/d3/d3-geo) and [node-canvas](https://github.com/Automattic/node-canvas)):
 
 ```js
-var fs = require('fs'),
-  d3_composite = require('d3-composite-projections'),
-  d3 = require('d3-geo'),
-  topojson = require('topojson-client'),
-  Canvas = require('canvas'),
-  es = require('./node_modules/es-atlas/es/municipalities.json');
+const fs = require('fs');
+const d3_composite = require('d3-composite-projections');
+const d3 = require('d3-geo');
+const topojson = require('topojson-client');
+const Canvas = require('canvas');
+const es = require('./node_modules/es-atlas/es/municipalities.json');
 
-var canvas = new Canvas(960, 500),
-  context = canvas.getContext('2d'),
-  projection = d3_composite.geoConicConformalSpain(),
-  path = d3.geoPath(projection, context);
+const canvas = new Canvas(960, 500);
+const context = canvas.getContext('2d');
+const projection = d3_composite.geoConicConformalSpain();
+const path = d3.geoPath(projection, context);
 
 context.beginPath();
 path(topojson.mesh(es));
