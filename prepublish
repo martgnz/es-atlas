@@ -15,6 +15,13 @@ if [ "$1" = true ]; then
   NDJSONMAP_ARGS="(name = d.properties.NAMEUNIT, delete d.properties, d.properties={}, d.properties.name=name, d)"
 fi
 
+if [ "$5" = true ]; then
+  echo "Preprojecting geodata"
+  GEOPROJECT='geoproject -n -r d3=d3-composite-projections "d3.geoConicConformalSpain()"'
+else
+  GEOPROJECT='cat'
+fi
+
 if [ "$4" != all ]; then
   NDJSONFILTER_ARGS="'${AUTONOMOUS_REGIONS_IDS}'.split(',').includes(d.properties.NATCODE.slice(2, 4))"
 
@@ -90,11 +97,11 @@ geo2topo -n \
   autonomous_regions=<( \
       cat es/_autonomous_regions.json \
         | ndjson-map "$NDJSONMAP_ARGS" \
-        | geoproject -n -r d3=d3-composite-projections 'd3.geoConicConformalSpain()') \
+        | eval "$GEOPROJECT" ) \
   border=<( \
       cat es/_border.json \
         | ndjson-map "$NDJSONMAP_ARGS" \
-        | geoproject -n -r d3=d3-composite-projections 'd3.geoConicConformalSpain()') \
+        | eval "$GEOPROJECT" ) \
   | topoquantize $QU \
   > es/autonomous_regions.json
 
@@ -106,15 +113,15 @@ geo2topo -n \
   provinces=<( \
       cat es/_provinces.json \
         | ndjson-map "$NDJSONMAP_ARGS" \
-        | geoproject -n -r d3=d3-composite-projections 'd3.geoConicConformalSpain()') \
+        | eval "$GEOPROJECT" ) \
   autonomous_regions=<( \
       cat es/_autonomous_regions.json \
         | ndjson-map "$NDJSONMAP_ARGS" \
-        | geoproject -n -r d3=d3-composite-projections 'd3.geoConicConformalSpain()') \
+        | eval "$GEOPROJECT" ) \
   border=<( \
       cat es/_border.json \
         | ndjson-map "$NDJSONMAP_ARGS" \
-        | geoproject -n -r d3=d3-composite-projections 'd3.geoConicConformalSpain()') \
+        | eval "$GEOPROJECT" ) \
   | topoquantize $QU \
   > es/provinces.json
 
@@ -131,19 +138,19 @@ geo2topo -n \
   municipalities=<( \
       cat es/_municipalities.json \
         | ndjson-map "$NDJSONMAP_ARGS" \
-        | geoproject -n -r d3=d3-composite-projections 'd3.geoConicConformalSpain()') \
+        | eval "$GEOPROJECT" ) \
   provinces=<( \
       cat es/_provinces.json \
         | ndjson-map "$NDJSONMAP_ARGS" \
-        | geoproject -n -r d3=d3-composite-projections 'd3.geoConicConformalSpain()') \
+        | eval "$GEOPROJECT" ) \
   autonomous_regions=<( \
       cat es/_autonomous_regions.json \
         | ndjson-map "$NDJSONMAP_ARGS" \
-        | geoproject -n -r d3=d3-composite-projections 'd3.geoConicConformalSpain()') \
+        | eval "$GEOPROJECT" ) \
   border=<( \
       cat es/_border.json \
         | ndjson-map "$NDJSONMAP_ARGS" \
-        | geoproject -n -r d3=d3-composite-projections 'd3.geoConicConformalSpain()') \
+        | eval "$GEOPROJECT" ) \
   | topoquantize $QU \
   > es/municipalities.json
 
