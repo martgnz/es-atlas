@@ -58,7 +58,7 @@ context.stroke();
 canvas.pngStream().pipe(fs.createWriteStream('preview.png'));
 ```
 
-I highly recommend using Roger Veciana’s [d3-composite-projections](https://github.com/rveciana/d3-composite-projections) with these files. Using a `ConicConformalSpain` projection will ensure that the Canary Islands are painted closer to the mainland and even [add a border](https://github.com/rveciana/d3-composite-projections#usage) to mark the projection zone.
+I highly recommend using Roger Veciana’s [d3-composite-projections](https://github.com/rveciana/d3-composite-projections). A `ConicConformalSpain` projection ensures that the Canary Islands are painted closer to the mainland and even [add a border](https://github.com/rveciana/d3-composite-projections#usage) to mark the projection zone.
 
 ## Generating the files
 
