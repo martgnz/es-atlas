@@ -4,7 +4,7 @@ This repository provides a simple script to generate TopoJSON files from the [Sp
 
 ## Usage
 
-In a browser (using [d3-geo](https://github.com/d3/d3-geo) and SVG):
+In a browser (using [d3-geo](https://github.com/d3/d3-geo) and SVG)
 
 ```html
 <!DOCTYPE html>
@@ -18,8 +18,7 @@ const svg = d3.select("svg");
 const projection = d3.geoConicConformalSpain();
 const path = d3.geoPath(projection);
 
-d3.json("https://unpkg.com/es-atlas@0.2.0/es/municipalities.json")
-  .then(es => {
+d3.json("https://unpkg.com/es-atlas@0.2.0/es/municipalities.json").then(es => {
     svg
       .append('path')
       .attr('d', path(topojson.mesh(es)))
@@ -74,6 +73,10 @@ npm run prepare --es-atlas:simplification=1e3
 ```
 
 ### Reference
+
+<a href="#preprojected" name="preprojected">#</a> <i>preprojected</i>
+
+Preprojects the map for faster rendering. Set to `false` by default.
 
 <a href="#with-names" name="with-names">#</a> <i>with-names</i>
 
