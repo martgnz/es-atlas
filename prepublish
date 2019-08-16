@@ -18,8 +18,10 @@ fi
 if [ "$5" = true ]; then
   echo "Preprojecting geodata"
   GEOPROJECT='geoproject -n -r d3=d3-composite-projections "d3.geoConicConformalSpain()"'
+  GEOPROJECT_BORDER='geoproject -n "d3.geoEquirectangular().rotate([5, -38.6]).scale(2700)"'
 else
   GEOPROJECT='cat'
+  GEOPROJECT_BORDER='cat'
 fi
 
 if [ "$4" != all ]; then
@@ -83,6 +85,9 @@ geo2topo -n municipalities=<( \
   | topomerge border=autonomous_regions \
   > es/municipalities.json
 
+CANARY_BBOX='{"type": "LineString", "coordinates": [[-14.0346750, 35.2],[-7.4208899, 35.536988],[-7.359, 33.54359]]}'
+echo $CANARY_BBOX > es/_composition_border.json
+
 # Inspired by: https://bl.ocks.org/mbostock/39b34968ad5eab65de1d7da81f78bb27
 # Re-compute the topology as a further optimization.
 # This consolidates unique sequences of arcs.
@@ -102,6 +107,9 @@ geo2topo -n \
       cat es/_border.json \
         | ndjson-map "$NDJSONMAP_ARGS" \
         | eval "$GEOPROJECT" ) \
+  composite_border=<( \
+      cat es/_composition_border.json \
+        | eval "$GEOPROJECT_BORDER" ) \
   | topoquantize $QU \
   > es/autonomous_regions.json
 
@@ -122,6 +130,9 @@ geo2topo -n \
       cat es/_border.json \
         | ndjson-map "$NDJSONMAP_ARGS" \
         | eval "$GEOPROJECT" ) \
+  composite_border=<( \
+      cat es/_composition_border.json \
+        | eval "$GEOPROJECT_BORDER" ) \
   | topoquantize $QU \
   > es/provinces.json
 
@@ -151,7 +162,10 @@ geo2topo -n \
       cat es/_border.json \
         | ndjson-map "$NDJSONMAP_ARGS" \
         | eval "$GEOPROJECT" ) \
+  composite_border=<( \
+      cat es/_composition_border.json \
+        | eval "$GEOPROJECT_BORDER" ) \
   | topoquantize $QU \
   > es/municipalities.json
 
-rm es/_municipalities.json es/_provinces.json es/_autonomous_regions.json es/_border.json
+rm es/_municipalities.json es/_provinces.json es/_autonomous_regions.json es/_border.json es/_composition_border.json
