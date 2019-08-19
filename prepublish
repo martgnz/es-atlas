@@ -168,4 +168,23 @@ geo2topo -n \
   | topoquantize $QU \
   > es/municipalities.json
 
+# receives as first argument a TopoJSON object in which a layer named
+# 'composite border' is wanted to be removed
+function removeLayer() {
+  arr=("$@")
+  for i in "${arr[@]}"; do
+    mapshaper \
+      -quiet \
+      -i "$i" \
+      -drop \
+      target=composite_border \
+      -o force "$i"
+  done
+}
+
+if [ "$5" = false ]; then
+    objects=(es/autonomous_regions.json es/provinces.json es/municipalities.json)
+    removeLayer "${objects[@]}"
+fi
+
 rm es/_municipalities.json es/_provinces.json es/_autonomous_regions.json es/_border.json es/_composition_border.json
