@@ -32,6 +32,7 @@
     "d3-composite-projections": "^1.2.3",
     "d3-dsv": "^1.1.1",
     "d3-geo-projection": "^2.7.0",
+    "mapshaper": "^0.4.126",
     "ndjson-cli": "^0.3.1",
     "shapefile": "^0.6.6",
     "topojson-client": "^3.0.0",
