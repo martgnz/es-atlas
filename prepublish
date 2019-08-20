@@ -1,44 +1,43 @@
 #!/bin/bash
 
+# Reference
+# https://github.com/topojson/us-atlas/blob/master/prepublish
+# https://github.com/topojson/world-atlas/blob/master/prepublish
+# https://medium.com/@mbostock/command-line-cartography-part-1-897aa8f8ca2c
+
 # Set path to installed node modules to run the script without npm
 PATH=$PATH:./node_modules/.bin
 
 # Default variables
-NDJSONMAP_ARGS="(delete d.properties, d)"
-NDJSONFILTER_ARGS='d'
-SP=$2
-QU=$3
+NDJSON_MAP_ARGS="(delete d.properties, d)"
+NDJSON_FILTER_ARGS='d'
+SIMPLIFICATION=$2
+QUANTIZATION=$3
 AUTONOMOUS_REGIONS_IDS=$4
 
 if [ "$1" = true ]; then
   echo "Adding names to the files"
-  NDJSONMAP_ARGS="(name = d.properties.NAMEUNIT, delete d.properties, d.properties={}, d.properties.name=name, d)"
-fi
 
-if [ "$5" = true ]; then
-  echo "Preprojecting geodata"
-  GEOPROJECT='geoproject -n -r d3=d3-composite-projections "d3.geoConicConformalSpain()"'
-  GEOPROJECT_BORDER='geoproject -n "d3.geoEquirectangular().rotate([5, -38.6]).scale(2700)"'
-else
-  GEOPROJECT='cat'
-  GEOPROJECT_BORDER='cat'
+  # https://github.com/mbostock/ndjson-cli#map
+  NDJSON_MAP_ARGS="(name = d.properties.NAMEUNIT, delete d.properties, d.properties={}, d.properties.name=name, d)"
 fi
 
 if [ "$4" != all ]; then
-  NDJSONFILTER_ARGS="'${AUTONOMOUS_REGIONS_IDS}'.split(',').includes(d.properties.NATCODE.slice(2, 4))"
+  # https://github.com/mbostock/ndjson-cli#filter
+  NDJSON_FILTER_ARGS="'${AUTONOMOUS_REGIONS_IDS}'.split(',').includes(d.properties.NATCODE.slice(2, 4))"
 
   # Change default quantization and simplification to have a sharper map
   if [ "$2" = 0.0001 ]; then
-    SP=1e-5
+    SIMPLIFICATION=1e-5
   fi
   if [ "$3" = 10000 ]; then
-    QU=1e5
+    QUANTIZATION=1e5
   fi
 fi
 
 echo "Autonomous regions: $AUTONOMOUS_REGIONS_IDS"
-echo "Simplification: $SP"
-echo "Quantization: $QU"
+echo "Simplification: $SIMPLIFICATION"
+echo "Quantization: $QUANTIZATION"
 
 rm -rvf es
 mkdir -p es
@@ -51,140 +50,105 @@ fi
 
 geo2topo -n autonomous_regions=<( \
     shp2json --encoding utf8 -n build/recintos_autonomicas_inspire_peninbal_etrs89.shp \
-      | ndjson-filter "$NDJSONFILTER_ARGS" \
+      | ndjson-filter "$NDJSON_FILTER_ARGS" \
       | ndjson-map '(d.id = d.properties.NATCODE.slice(2, 4), d)'
     shp2json --encoding utf8 -n build/recintos_autonomicas_inspire_canarias_wgs84.shp \
-      | ndjson-filter "$NDJSONFILTER_ARGS" \
+      | ndjson-filter "$NDJSON_FILTER_ARGS" \
       | ndjson-map '(d.id = d.properties.NATCODE.slice(2, 4), d)') \
-  | toposimplify -f -p $SP \
+  | toposimplify -f -p $SIMPLIFICATION \
   | topomerge border=autonomous_regions \
   > es/autonomous_regions.json
 
 geo2topo -n provinces=<( \
     shp2json --encoding utf8 -n build/recintos_provinciales_inspire_peninbal_etrs89.shp \
-      | ndjson-filter "$NDJSONFILTER_ARGS" \
+      | ndjson-filter "$NDJSON_FILTER_ARGS" \
       | ndjson-map '(d.id = d.properties.NATCODE.slice(4, 6), d)'
     shp2json --encoding utf8 -n build/recintos_provinciales_inspire_canarias_wgs84.shp \
-      | ndjson-filter "$NDJSONFILTER_ARGS" \
+      | ndjson-filter "$NDJSON_FILTER_ARGS" \
       | ndjson-map '(d.id = d.properties.NATCODE.slice(4, 6), d)') \
-  | toposimplify -f -p $SP \
+  | toposimplify -f -p $SIMPLIFICATION \
   | topomerge autonomous_regions=provinces -k 'd.properties.NATCODE.slice(2, 4)' \
   | topomerge border=autonomous_regions \
   > es/provinces.json
 
 geo2topo -n municipalities=<( \
     shp2json --encoding utf8 -n build/recintos_municipales_inspire_peninbal_etrs89.shp \
-      | ndjson-filter "$NDJSONFILTER_ARGS" \
+      | ndjson-filter "$NDJSON_FILTER_ARGS" \
       | ndjson-map '(d.id = d.properties.NATCODE.slice(6, 11), d)'
     shp2json --encoding utf8 -n build/recintos_municipales_inspire_canarias_wgs84.shp \
-      | ndjson-filter "$NDJSONFILTER_ARGS" \
+      | ndjson-filter "$NDJSON_FILTER_ARGS" \
       | ndjson-map '(d.id = d.properties.NATCODE.slice(6, 11), d)') \
-  | toposimplify -f -p $SP \
+  | toposimplify -f -p $SIMPLIFICATION \
   | topomerge provinces=municipalities -k 'd.properties.NATCODE.slice(4, 6)' \
   | topomerge autonomous_regions=municipalities -k 'd.properties.NATCODE.slice(2, 4)' \
   | topomerge border=autonomous_regions \
   > es/municipalities.json
 
-CANARY_BBOX='{"type": "LineString", "coordinates": [[-14.0346750, 35.2],[-7.4208899, 35.536988],[-7.359, 33.54359]]}'
-echo $CANARY_BBOX > es/_composition_border.json
+# Initialise set of layers
+layers=()
+
+# Creates a temp GeoJSON to add our feature names or preproject if needed
+temp_layer() {
+  cat es/$1.geojson | ndjson-map "$NDJSON_MAP_ARGS" | eval "$GEOPROJECT" > es/.tmp.$1.geojson
+}
+
+# Converts our final TopoJSON
+to_topojson() {
+  geo2topo -n \
+    "${layers[@]}" \
+    | topoquantize $QUANTIZATION \
+    > es/$1.json
+}
+
+if [ "$5" = true ]; then
+  echo "Preprojecting geodata"
+
+  # https://github.com/d3/d3-geo-projection#geoproject
+  GEOPROJECT='geoproject -n -r d3=d3-composite-projections "d3.geoConicConformalSpain()"'
+
+  # Write Canary Islands composition border to a GeoJSON
+  # https://github.com/rveciana/d3-composite-projections/blob/master/src/conicConformalSpain.js#L129-L131
+  echo '{"type": "LineString", "coordinates": [[-14.0346750, 35.2],[-7.4208899, 35.536988],[-7.359, 33.54359]]}' \
+    | geoproject -n "d3.geoEquirectangular().rotate([5, -38.6]).scale(2700)" \
+    > es/.tmp.composite_border.geojson
+  
+  # Add composition border to our layers
+  layers+=("composite_border=es/.tmp.composite_border.geojson")
+else
+  GEOPROJECT='cat'
+fi
 
 # Inspired by: https://bl.ocks.org/mbostock/39b34968ad5eab65de1d7da81f78bb27
 # Re-compute the topology as a further optimization.
 # This consolidates unique sequences of arcs.
 # https://github.com/topojson/topojson-simplify/issues/4
 
-topo2geo -n \
-  < es/autonomous_regions.json \
-  autonomous_regions=es/_autonomous_regions.json \
-  border=es/_border.json
-
-geo2topo -n \
-  autonomous_regions=<( \
-      cat es/_autonomous_regions.json \
-        | ndjson-map "$NDJSONMAP_ARGS" \
-        | eval "$GEOPROJECT" ) \
-  border=<( \
-      cat es/_border.json \
-        | ndjson-map "$NDJSONMAP_ARGS" \
-        | eval "$GEOPROJECT" ) \
-  composite_border=<( \
-      cat es/_composition_border.json \
-        | eval "$GEOPROJECT_BORDER" ) \
-  | topoquantize $QU \
-  > es/autonomous_regions.json
-
-topo2geo -n \
-  < es/provinces.json \
-  provinces=es/_provinces.json
-
-geo2topo -n \
-  provinces=<( \
-      cat es/_provinces.json \
-        | ndjson-map "$NDJSONMAP_ARGS" \
-        | eval "$GEOPROJECT" ) \
-  autonomous_regions=<( \
-      cat es/_autonomous_regions.json \
-        | ndjson-map "$NDJSONMAP_ARGS" \
-        | eval "$GEOPROJECT" ) \
-  border=<( \
-      cat es/_border.json \
-        | ndjson-map "$NDJSONMAP_ARGS" \
-        | eval "$GEOPROJECT" ) \
-  composite_border=<( \
-      cat es/_composition_border.json \
-        | eval "$GEOPROJECT_BORDER" ) \
-  | topoquantize $QU \
-  > es/provinces.json
-
-rm es/_provinces.json es/_autonomous_regions.json es/_border.json
-
+# Extract GeoJSON files
 topo2geo -n \
   < es/municipalities.json \
-  municipalities=es/_municipalities.json \
-  provinces=es/_provinces.json \
-  autonomous_regions=es/_autonomous_regions.json \
-  border=es/_border.json
+  autonomous_regions=es/autonomous_regions.geojson \
+  provinces=es/provinces.geojson \
+  municipalities=es/municipalities.geojson \
+  border=es/border.geojson
 
-geo2topo -n \
-  municipalities=<( \
-      cat es/_municipalities.json \
-        | ndjson-map "$NDJSONMAP_ARGS" \
-        | eval "$GEOPROJECT" ) \
-  provinces=<( \
-      cat es/_provinces.json \
-        | ndjson-map "$NDJSONMAP_ARGS" \
-        | eval "$GEOPROJECT" ) \
-  autonomous_regions=<( \
-      cat es/_autonomous_regions.json \
-        | ndjson-map "$NDJSONMAP_ARGS" \
-        | eval "$GEOPROJECT" ) \
-  border=<( \
-      cat es/_border.json \
-        | ndjson-map "$NDJSONMAP_ARGS" \
-        | eval "$GEOPROJECT" ) \
-  composite_border=<( \
-      cat es/_composition_border.json \
-        | eval "$GEOPROJECT_BORDER" ) \
-  | topoquantize $QU \
-  > es/municipalities.json
+# Creates temp layers
+temp_layer autonomous_regions
+temp_layer provinces
+temp_layer municipalities
+temp_layer border
 
-# receives as first argument a TopoJSON object in which a layer named
-# 'composite border' is wanted to be removed
-function removeLayer() {
-  arr=("$@")
-  for i in "${arr[@]}"; do
-    mapshaper \
-      -quiet \
-      -i "$i" \
-      -drop \
-      target=composite_border \
-      -o force "$i"
-  done
-}
+# Set default layers and convert autonomous regions
+layers+=("autonomous_regions=es/.tmp.autonomous_regions.geojson")
+layers+=("border=es/.tmp.border.geojson")
+to_topojson autonomous_regions
 
-if [ "$5" = false ]; then
-    objects=(es/autonomous_regions.json es/provinces.json es/municipalities.json)
-    removeLayer "${objects[@]}"
-fi
+# Convert provinces
+layers+=("provinces=es/.tmp.provinces.geojson")
+to_topojson provinces
 
-rm es/_municipalities.json es/_provinces.json es/_autonomous_regions.json es/_border.json es/_composition_border.json
+# Convert municipalities
+layers+=("municipalities=es/.tmp.municipalities.geojson")
+to_topojson municipalities
+
+# Remove temp files
+rm es/.*.geojson es/*.geojson
