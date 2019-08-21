@@ -113,7 +113,7 @@ if [ "$PREPROJECT" = true ]; then
   echo '{"type": "LineString", "coordinates": [[-14.0346750, 35.2],[-7.4208899, 35.536988],[-7.359, 33.54359]]}' \
     | geoproject -n "d3.geoEquirectangular().rotate([5, -38.6]).scale(2700)" \
     > es/.tmp.composite_border.geojson
-  
+
   # Add composition border to our layers
   layers+=("composite_border=es/.tmp.composite_border.geojson")
 else
@@ -125,6 +125,37 @@ fi
 # This consolidates unique sequences of arcs.
 # https://github.com/topojson/topojson-simplify/issues/4
 
+
+# Autonomous Regions
+# Extract GeoJSON files
+
+topo2geo -n \
+  < es/autonomous_regions.json \
+  autonomous_regions=es/autonomous_regions.geojson \
+  border=es/border.geojson
+
+# Creates temp layers
+temp_layer autonomous_regions
+temp_layer border
+
+# Convert autonomous_regions
+layers+=("autonomous_regions=es/.tmp.autonomous_regions.geojson")
+layers+=("border=es/.tmp.border.geojson")
+to_topojson autonomous_regions
+
+# Provinces
+# Extract GeoJSON files
+topo2geo -n \
+  < es/provinces.json \
+  provinces=es/provinces.geojson
+
+temp_layer provinces
+
+# Convert provinces
+layers+=("provinces=es/.tmp.provinces.geojson")
+to_topojson provinces
+
+# Municipalities
 # Extract GeoJSON files
 topo2geo -n \
   < es/municipalities.json \
@@ -133,20 +164,7 @@ topo2geo -n \
   municipalities=es/municipalities.geojson \
   border=es/border.geojson
 
-# Creates temp layers
-temp_layer autonomous_regions
-temp_layer provinces
 temp_layer municipalities
-temp_layer border
-
-# Set default layers and convert autonomous regions
-layers+=("autonomous_regions=es/.tmp.autonomous_regions.geojson")
-layers+=("border=es/.tmp.border.geojson")
-to_topojson autonomous_regions
-
-# Convert provinces
-layers+=("provinces=es/.tmp.provinces.geojson")
-to_topojson provinces
 
 # Convert municipalities
 layers+=("municipalities=es/.tmp.municipalities.geojson")
