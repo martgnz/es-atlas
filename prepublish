@@ -11,11 +11,13 @@ PATH=$PATH:./node_modules/.bin
 # Default variables
 NDJSON_MAP_ARGS="(delete d.properties, d)"
 NDJSON_FILTER_ARGS='d'
+ADD_NAMES=$1
 SIMPLIFICATION=$2
 QUANTIZATION=$3
 AUTONOMOUS_REGIONS_IDS=$4
+PREPROJECT=$5
 
-if [ "$1" = true ]; then
+if [ "$ADD_NAMES" ]; then
   echo "Adding names to the files"
 
   # https://github.com/mbostock/ndjson-cli#map
@@ -100,7 +102,7 @@ to_topojson() {
     > es/$1.json
 }
 
-if [ "$5" = true ]; then
+if [ "$PREPROJECT" = true ]; then
   echo "Preprojecting geodata"
 
   # https://github.com/d3/d3-geo-projection#geoproject
