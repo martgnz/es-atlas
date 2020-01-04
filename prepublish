@@ -9,13 +9,12 @@
 PATH=$PATH:./node_modules/.bin
 
 # Default variables
-NDJSON_MAP_ARGS="(delete d.properties, d)"
+NDJSON_MAP_ARGS="{}"
 NDJSON_FILTER_ARGS='d'
 ADD_NAMES=$1
 SIMPLIFICATION=$2
 QUANTIZATION=$3
 AUTONOMOUS_REGIONS_IDS=$4
-PREPROJECT=$5
 
 logs=()
 
@@ -26,7 +25,7 @@ if [ "$ADD_NAMES" = true ]; then
   logs+=("+ Adding names to the files")
 
   # https://github.com/mbostock/ndjson-cli#map
-  NDJSON_MAP_ARGS="(name = d.properties.NAMEUNIT, delete d.properties, d.properties={}, d.properties.name=name, d)"
+  NDJSON_MAP_ARGS="{name: d.properties.NAMEUNIT}"
 fi
 
 if [ "$4" != all ]; then
@@ -42,26 +41,6 @@ if [ "$4" != all ]; then
   fi
 fi
 
-# Initialise set of layers
-layers=()
-
-if [ "$PREPROJECT" = true ]; then
-  logs+=("+ Preprojecting geodata")
-
-  # https://github.com/d3/d3-geo-projection#geoproject
-  GEOPROJECT='geoproject -n -r d3=d3-composite-projections "d3.geoConicConformalSpain()"'
-
-  # Write Canary Islands composition border to a GeoJSON
-  echo '{"type": "LineString", "coordinates": [[-14.0346750, 35.2],[-7.4208899, 35.536988],[-7.359, 33.54359]]}' \
-    | geoproject -n "d3.geoEquirectangular().rotate([5, -38.6]).scale(2700)" \
-    > es/.tmp.composite_border.geojson
-
-  # Add composition border to our layers
-  layers+=("composite_border=es/.tmp.composite_border.geojson")
-else
-  GEOPROJECT='cat'
-fi
-
 logs+=("+ Autonomous regions: $AUTONOMOUS_REGIONS_IDS")
 logs+=("+ Simplification: $SIMPLIFICATION")
 logs+=("+ Quantization: $QUANTIZATION")
@@ -72,19 +51,6 @@ if [ ! -d build ]; then
   unzip -jod build build/lineas_limite.zip recintos_municipales* recintos_provinciales* recintos_autonomicas*
 fi
 
-# Creates a temp GeoJSON to add our feature names or preproject if needed
-temp_layer() {
-  cat es/$1.geojson | ndjson-map "$NDJSON_MAP_ARGS" | eval "$GEOPROJECT" > es/.tmp.$1.geojson
-}
-
-# Converts our final TopoJSON
-to_topojson() {
-  geo2topo -n \
-    "${layers[@]}" \
-    | topoquantize $QUANTIZATION \
-    > es/$1.json
-}
-
 print_logs() {
     printf '\n%30s\n' |tr " " "-"
     for i in "${logs[@]}"; do 
@@ -94,16 +60,36 @@ print_logs() {
 }
 print_logs
 
+echo '{"type": "LineString", "coordinates": [[-14.0346750, 35.2],[-7.4208899, 35.536988],[-7.359, 33.54359]]}' \
+    | geoproject -n "d3.geoEquirectangular().rotate([5, -38.6]).scale(2700)" \
+    > es/.tmp.composite_border.geojson
+
 geo2topo -n autonomous_regions=<( \
     shp2json --encoding utf8 -n build/recintos_autonomicas_inspire_peninbal_etrs89.shp \
       | ndjson-filter "$NDJSON_FILTER_ARGS" \
-      | ndjson-map '(d.id = d.properties.NATCODE.slice(2, 4), d)'
+      | ndjson-map '(d.id = d.properties.NATCODE.slice(2, 4), d.properties = {name: d.properties.NAMEUNIT}, d)'
     shp2json --encoding utf8 -n build/recintos_autonomicas_inspire_canarias_wgs84.shp \
       | ndjson-filter "$NDJSON_FILTER_ARGS" \
-      | ndjson-map '(d.id = d.properties.NATCODE.slice(2, 4), d)') \
+      | ndjson-map '(d.id = d.properties.NATCODE.slice(2, 4), d.properties = {name: d.properties.NAMEUNIT}, d)') \
   | toposimplify -f -p $SIMPLIFICATION \
   | topomerge border=autonomous_regions \
+  | topoquantize $QUANTIZATION \
   > es/autonomous_regions.json
+
+geo2topo -n autonomous_regions=<( \
+    shp2json --encoding utf8 -n build/recintos_autonomicas_inspire_peninbal_etrs89.shp \
+      | ndjson-filter "$NDJSON_FILTER_ARGS" \
+      | ndjson-map '(d.id = d.properties.NATCODE.slice(2, 4), d.properties = {name: d.properties.NAMEUNIT}, d)' \
+      | geoproject -n -r d3=d3-composite-projections 'd3.geoConicConformalSpain()'
+    shp2json --encoding utf8 -n build/recintos_autonomicas_inspire_canarias_wgs84.shp \
+      | ndjson-filter "$NDJSON_FILTER_ARGS" \
+      | ndjson-map '(d.id = d.properties.NATCODE.slice(2, 4), d.properties = {name: d.properties.NAMEUNIT}, d)' \
+      | geoproject -n -r d3=d3-composite-projections 'd3.geoConicConformalSpain()') \
+  composite_border=es/.tmp.composite_border.geojson \
+  | toposimplify -f -p 0.25 \
+  | topomerge border=autonomous_regions \
+  | topoquantize $QUANTIZATION \
+  > es/autonomous_regions-conic.json
 
 geo2topo -n provinces=<( \
     shp2json --encoding utf8 -n build/recintos_provinciales_inspire_peninbal_etrs89.shp \
@@ -115,7 +101,30 @@ geo2topo -n provinces=<( \
   | toposimplify -f -p $SIMPLIFICATION \
   | topomerge autonomous_regions=provinces -k 'd.properties.NATCODE.slice(2, 4)' \
   | topomerge border=autonomous_regions \
+  | topoquantize $QUANTIZATION \
+  | ndjson-map '(d.objects.border.geometries.forEach(d => d.properties = {}), d)' \
+  | ndjson-map '(d.objects.autonomous_regions.geometries.forEach(d => d.properties = {}), d)' \
+  | ndjson-map '(d.objects.provinces.geometries.forEach(d => d.properties = {name: d.properties.NAMEUNIT}), d)' \
   > es/provinces.json
+
+geo2topo -n provinces=<( \
+  shp2json --encoding utf8 -n build/recintos_provinciales_inspire_peninbal_etrs89.shp \
+    | ndjson-filter "$NDJSON_FILTER_ARGS" \
+    | ndjson-map '(d.id = d.properties.NATCODE.slice(4, 6), d)' \
+    | geoproject -n -r d3=d3-composite-projections 'd3.geoConicConformalSpain()'
+  shp2json --encoding utf8 -n build/recintos_provinciales_inspire_canarias_wgs84.shp \
+    | ndjson-filter "$NDJSON_FILTER_ARGS" \
+    | ndjson-map '(d.id = d.properties.NATCODE.slice(4, 6), d)' \
+    | geoproject -n -r d3=d3-composite-projections 'd3.geoConicConformalSpain()') \
+  composite_border=es/.tmp.composite_border.geojson \
+  | toposimplify -f -p 0.25 \
+  | topomerge autonomous_regions=provinces -k 'd.properties.NATCODE.slice(2, 4)' \
+  | topomerge border=autonomous_regions \
+  | topoquantize $QUANTIZATION \
+  | ndjson-map '(d.objects.border.geometries.forEach(d => d.properties = {}), d)' \
+  | ndjson-map '(d.objects.autonomous_regions.geometries.forEach(d => d.properties = {}), d)' \
+  | ndjson-map '(d.objects.provinces.geometries.forEach(d => d.properties = {name: d.properties.NAMEUNIT}), d)' \
+  > es/provinces-conic.json
 
 geo2topo -n municipalities=<( \
     shp2json --encoding utf8 -n build/recintos_municipales_inspire_peninbal_etrs89.shp \
@@ -128,56 +137,33 @@ geo2topo -n municipalities=<( \
   | topomerge provinces=municipalities -k 'd.properties.NATCODE.slice(4, 6)' \
   | topomerge autonomous_regions=municipalities -k 'd.properties.NATCODE.slice(2, 4)' \
   | topomerge border=autonomous_regions \
+  | topoquantize $QUANTIZATION \
+  | ndjson-map '(d.objects.border.geometries.forEach(d => d.properties = {}), d)' \
+  | ndjson-map '(d.objects.municipalities.geometries.forEach(d => d.properties = '"$NDJSON_MAP_ARGS"'), d)' \
+  | ndjson-map '(d.objects.provinces.geometries.forEach(d => d.properties = {}), d)' \
+  | ndjson-map '(d.objects.autonomous_regions.geometries.forEach(d => d.properties = {}), d)' \
   > es/municipalities.json
 
-# Inspired by: https://bl.ocks.org/mbostock/39b34968ad5eab65de1d7da81f78bb27
-# Re-compute the topology as a further optimization.
-# This consolidates unique sequences of arcs.
-# https://github.com/topojson/topojson-simplify/issues/4
-
-
-# Autonomous Regions
-# Extract GeoJSON files
-topo2geo -n \
-  < es/autonomous_regions.json \
-  autonomous_regions=es/autonomous_regions.geojson \
-  border=es/border.geojson
-
-# Creates temp layers
-temp_layer autonomous_regions
-temp_layer border
-
-# Convert autonomous_regions
-layers+=("autonomous_regions=es/.tmp.autonomous_regions.geojson")
-layers+=("border=es/.tmp.border.geojson")
-to_topojson autonomous_regions
-
-# Provinces
-# Extract GeoJSON files
-topo2geo -n \
-  < es/provinces.json \
-  provinces=es/provinces.geojson
-
-temp_layer provinces
-
-# Convert provinces
-layers+=("provinces=es/.tmp.provinces.geojson")
-to_topojson provinces
-
-# Municipalities
-# Extract GeoJSON files
-topo2geo -n \
-  < es/municipalities.json \
-  autonomous_regions=es/autonomous_regions.geojson \
-  provinces=es/provinces.geojson \
-  municipalities=es/municipalities.geojson \
-  border=es/border.geojson
-
-temp_layer municipalities
-
-# Convert municipalities
-layers+=("municipalities=es/.tmp.municipalities.geojson")
-to_topojson municipalities
+geo2topo -n municipalities=<( \
+    shp2json --encoding utf8 -n build/recintos_municipales_inspire_peninbal_etrs89.shp \
+      | ndjson-filter "$NDJSON_FILTER_ARGS" \
+      | ndjson-map '(d.id = d.properties.NATCODE.slice(6, 11), d)' \
+      | geoproject -n -r d3=d3-composite-projections 'd3.geoConicConformalSpain()'
+    shp2json --encoding utf8 -n build/recintos_municipales_inspire_canarias_wgs84.shp \
+      | ndjson-filter "$NDJSON_FILTER_ARGS" \
+      | ndjson-map '(d.id = d.properties.NATCODE.slice(6, 11), d)' \
+      | geoproject -n -r d3=d3-composite-projections 'd3.geoConicConformalSpain()') \
+  composite_border=es/.tmp.composite_border.geojson \
+  | toposimplify -f -p 0.25 \
+  | topomerge provinces=municipalities -k 'd.properties.NATCODE.slice(4, 6)' \
+  | topomerge autonomous_regions=municipalities -k 'd.properties.NATCODE.slice(2, 4)' \
+  | topomerge border=autonomous_regions \
+  | topoquantize $QUANTIZATION \
+  | ndjson-map '(d.objects.border.geometries.forEach(d => d.properties = '"$NDJSON_MAP_ARGS"'), d)' \
+  | ndjson-map '(d.objects.municipalities.geometries.forEach(d => d.properties = '"$NDJSON_MAP_ARGS"'), d)' \
+  | ndjson-map '(d.objects.provinces.geometries.forEach(d => d.properties = {}), d)' \
+  | ndjson-map '(d.objects.autonomous_regions.geometries.forEach(d => d.properties = {}), d)' \
+  > es/municipalities-conic.json
 
 # Remove temp files
-rm es/.*.geojson es/*.geojson
+rm es/.*.geojson

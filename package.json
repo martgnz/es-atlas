@@ -10,8 +10,7 @@
     "with-names": false,
     "simplification": 0.0001,
     "quantization": 10000,
-    "autonomous-regions": "all",
-    "preproject": false
+    "autonomous-regions": "all"
   },
   "repository": {
     "type": "git",
