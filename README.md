@@ -75,7 +75,7 @@ npm run prepare --es-atlas:simplification=1e3
 
 ### Reference
 
-<a href="#with-names" name="with-names">#</a> <i>with-names</i>
+<a href="#add_names" name="add_names">#</a> <i>add_names</i>
 
 Adds a `name` property to the generated files with the feature name. Set to `false` by default.
 
