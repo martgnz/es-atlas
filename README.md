@@ -9,16 +9,16 @@ In a browser (using [d3-geo](https://github.com/d3/d3-geo) and SVG):
 ```html
 <!DOCTYPE html>
 <svg width="960" height="500"></svg>
-<script src="https://d3js.org/d3.v5.min.js"></script>
+<script src="https://d3js.org/d3.v6.min.js"></script>
 <script src="https://d3js.org/topojson.v3.min.js"></script>
-<script src="https://unpkg.com/d3-composite-projections@1.2.0"></script>
+<script src="https://unpkg.com/d3-composite-projections@1.4.0"></script>
 <script>
 
 const svg = d3.select("svg");
 const projection = d3.geoConicConformalSpain();
 const path = d3.geoPath(projection);
 
-d3.json("https://unpkg.com/es-atlas@0.2.0/es/municipalities.json")
+d3.json("https://unpkg.com/es-atlas@0.3.0/es/municipalities.json")
   .then(es => {
     svg
       .append('path')
