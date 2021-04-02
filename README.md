@@ -18,7 +18,7 @@ const svg = d3.select("svg");
 const projection = d3.geoConicConformalSpain();
 const path = d3.geoPath(projection);
 
-d3.json("https://unpkg.com/es-atlas@0.3.0/es/municipalities.json")
+d3.json("https://unpkg.com/es-atlas@0.3.1/es/municipalities.json")
   .then(es => {
     svg
       .append('path')
