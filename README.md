@@ -92,7 +92,7 @@ Removes information by reducing the precision of each coordinate. Set to `1e4` b
 Filters the result by the given [autonomous region](http://www.ine.es/en/daco/daco42/codmun/cod_ccaa_en.htm) `id` separated by comma.
 
 ```shell
-npm run prepare --es-atlas:autonomous-regions=09,10,14,04
+npm run prepare --es-atlas:autonomous_regions=09,10,14,04
 ```
 
 ## File Reference
