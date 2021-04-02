@@ -10,7 +10,7 @@ SIMPLIFICATION=$npm_package_config_simplification
 QUANTIZATION=$npm_package_config_quantization
 AUTONOMOUS_REGIONS_IDS=$npm_package_config_autonomous_regions
 
-if [ $npm_package_config_add_names = true ]; then
+if [ "$npm_package_config_add_names" = true ]; then
   echo "Adding names to the files"
   NDJSONMAP_ARGS="(name = d.properties.NAMEUNIT, delete d.properties, d.properties={}, d.properties.name=name, d)"
 fi
@@ -36,7 +36,7 @@ mkdir -p es
 
 if [ ! -d build ]; then
   mkdir build
-  curl  "http://centrodedescargas.cnig.es/CentroDescargas/descargaDir" --compressed --data "secuencialDescDir=9000029&aceptCodsLicsDD_0=15" > build/lineas_limite.zip
+  curl  "https://centrodedescargas.cnig.es/CentroDescargas/descargaDir" --compressed --data "secuencialDescDir=9000029&aceptCodsLicsDD_0=15" > build/lineas_limite.zip
   unzip -jod build build/lineas_limite.zip \
     SIGLIM_Publico_INSPIRE/\*/recintos_autonomicas\* \
     SIGLIM_Publico_INSPIRE/\*/recintos_provinciales\* \
