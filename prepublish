@@ -6,30 +6,30 @@ PATH=$PATH:./node_modules/.bin
 # Default variables
 NDJSONMAP_ARGS="(delete d.properties, d)"
 NDJSONFILTER_ARGS='d'
-SP=$2
-QU=$3
-AUTONOMOUS_REGIONS_IDS=$4
+SIMPLIFICATION=$npm_package_config_simplification
+QUANTIZATION=$npm_package_config_quantization
+AUTONOMOUS_REGIONS_IDS=$npm_package_config_autonomous_regions
 
-if [ "$1" = true ]; then
+if [ $npm_package_config_add_names = true ]; then
   echo "Adding names to the files"
   NDJSONMAP_ARGS="(name = d.properties.NAMEUNIT, delete d.properties, d.properties={}, d.properties.name=name, d)"
 fi
 
-if [ "$4" != all ]; then
+if [ $AUTONOMOUS_REGIONS_IDS != all ]; then
   NDJSONFILTER_ARGS="'${AUTONOMOUS_REGIONS_IDS}'.split(',').includes(d.properties.NATCODE.slice(2, 4))"
 
   # Change default quantization and simplification to have a sharper map
-  if [ "$2" = 0.0001 ]; then
-    SP=1e-5
+  if [ $SIMPLIFICATION = 0.0001 ]; then
+    SIMPLIFICATION=1e-5
   fi
-  if [ "$3" = 10000 ]; then
-    QU=1e5
+  if [ $QUANTIZATION = 10000 ]; then
+    QUANTIZATION=1e5
   fi
 fi
 
 echo "Autonomous regions: $AUTONOMOUS_REGIONS_IDS"
-echo "Simplification: $SP"
-echo "Quantization: $QU"
+echo "Simplification: $SIMPLIFICATION"
+echo "Quantization: $QUANTIZATION"
 
 rm -rvf es
 mkdir -p es
@@ -37,7 +37,10 @@ mkdir -p es
 if [ ! -d build ]; then
   mkdir build
   curl  "http://centrodedescargas.cnig.es/CentroDescargas/descargaDir" --compressed --data "secuencialDescDir=9000029&aceptCodsLicsDD_0=15" > build/lineas_limite.zip
-  unzip -jod build build/lineas_limite.zip recintos_municipales* recintos_provinciales* recintos_autonomicas*
+  unzip -jod build build/lineas_limite.zip \
+    SIGLIM_Publico_INSPIRE/\*/recintos_autonomicas\* \
+    SIGLIM_Publico_INSPIRE/\*/recintos_provinciales\* \
+    SIGLIM_Publico_INSPIRE/\*/recintos_municipales\*
 fi
 
 geo2topo -n autonomous_regions=<( \
@@ -47,7 +50,7 @@ geo2topo -n autonomous_regions=<( \
     shp2json --encoding utf8 -n build/recintos_autonomicas_inspire_canarias_wgs84.shp \
       | ndjson-filter "$NDJSONFILTER_ARGS" \
       | ndjson-map '(d.id = d.properties.NATCODE.slice(2, 4), d)') \
-  | toposimplify -f -p $SP \
+  | toposimplify -f -p $SIMPLIFICATION \
   | topomerge border=autonomous_regions \
   > es/autonomous_regions.json
 
@@ -58,7 +61,7 @@ geo2topo -n provinces=<( \
     shp2json --encoding utf8 -n build/recintos_provinciales_inspire_canarias_wgs84.shp \
       | ndjson-filter "$NDJSONFILTER_ARGS" \
       | ndjson-map '(d.id = d.properties.NATCODE.slice(4, 6), d)') \
-  | toposimplify -f -p $SP \
+  | toposimplify -f -p $SIMPLIFICATION \
   | topomerge autonomous_regions=provinces -k 'd.properties.NATCODE.slice(2, 4)' \
   | topomerge border=autonomous_regions \
   > es/provinces.json
@@ -70,7 +73,7 @@ geo2topo -n municipalities=<( \
     shp2json --encoding utf8 -n build/recintos_municipales_inspire_canarias_wgs84.shp \
       | ndjson-filter "$NDJSONFILTER_ARGS" \
       | ndjson-map '(d.id = d.properties.NATCODE.slice(6, 11), d)') \
-  | toposimplify -f -p $SP \
+  | toposimplify -f -p $SIMPLIFICATION \
   | topomerge provinces=municipalities -k 'd.properties.NATCODE.slice(4, 6)' \
   | topomerge autonomous_regions=municipalities -k 'd.properties.NATCODE.slice(2, 4)' \
   | topomerge border=autonomous_regions \
@@ -93,7 +96,7 @@ geo2topo -n \
   border=<( \
       cat es/_border.json \
         | ndjson-map "$NDJSONMAP_ARGS") \
-  | topoquantize $QU \
+  | topoquantize $QUANTIZATION \
   > es/autonomous_regions.json
 
 topo2geo -n \
@@ -110,7 +113,7 @@ geo2topo -n \
   border=<( \
       cat es/_border.json \
         | ndjson-map "$NDJSONMAP_ARGS") \
-  | topoquantize $QU \
+  | topoquantize $QUANTIZATION \
   > es/provinces.json
 
 rm es/_provinces.json es/_autonomous_regions.json es/_border.json
@@ -135,7 +138,7 @@ geo2topo -n \
   border=<( \
       cat es/_border.json \
         | ndjson-map "$NDJSONMAP_ARGS") \
-  | topoquantize $QU \
+  | topoquantize $QUANTIZATION \
   > es/municipalities.json
 
 rm es/_municipalities.json es/_provinces.json es/_autonomous_regions.json es/_border.json
