@@ -77,7 +77,7 @@ npm run prepare --es-atlas:simplification=1e3
 
 <a href="#add_names" name="add_names">#</a> <i>add_names</i>
 
-Adds a `name` property to the generated files with the feature name. Set to `false` by default.
+Adds a `name` property to the generated files with the feature name. Set to `true` by default.
 
 <a href="#simplification" name="simplification">#</a> <i>simplification</i>
 
@@ -99,7 +99,7 @@ npm run prepare --es-atlas:autonomous_regions=09,10,14,04
 
 <a href="#es/municipalities.json" name="es/municipalities.json">#</a> <b>es/municipalities.json</b> [<>](https://unpkg.com/es-atlas/es/municipalities.json 'Source')
 
-A TopoJSON which contains four objects: _municipalities_, _provinces_, _autonomous regions_ and _border_. Every city, province and region has its corresponding [National Statistics Institute](http://www.ine.es/en/welcome.shtml) identifier, so it's easy to get started.
+A TopoJSON which contains four objects: _municipalities_, _provinces_, _autonomous regions_ and _border_. Every city, province and region has its corresponding [National Statistics Institute](http://www.ine.es/en/welcome.shtml) identifier and name, so it's easy to get started.
 
 <a href="#es/municipalities.json_municipalities" name="es/municipalities.json_municipalities">#</a> _es_.objects.<b>municipalities</b>
 
