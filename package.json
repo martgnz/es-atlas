@@ -7,7 +7,6 @@
     "postpublish": "git push && git push --tags"
   },
   "config": {
-    "add_names": true,
     "simplification": 0.0001,
     "quantization": 10000,
     "autonomous_regions": "all"

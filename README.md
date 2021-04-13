@@ -75,10 +75,6 @@ npm run prepare --es-atlas:simplification=1e3
 
 ### Reference
 
-<a href="#add_names" name="add_names">#</a> <i>add_names</i>
-
-Adds a `name` property to the generated files with the feature name. Set to `true` by default.
-
 <a href="#simplification" name="simplification">#</a> <i>simplification</i>
 
 Removes points to reduce the file size. Set to `1e-4` by default.
