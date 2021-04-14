@@ -67,12 +67,6 @@ Clone or download the repo, start a terminal and run `npm install` in the folder
 
 If you need to make further adjustments (simplification, quantization) you can change the `package.json` config and run `npm install` again.
 
-You can also run the script with inline arguments:
-
-```shell
-npm run prepare --es-atlas:simplification=1e3
-```
-
 ### Reference
 
 <a href="#simplification" name="simplification">#</a> <i>simplification</i>
@@ -86,10 +80,6 @@ Removes information by reducing the precision of each coordinate. Set to `1e4` b
 <a href="#autonomous_regions" name="autonomous_regions">#</a> <i>autonomous_regions</i>
 
 Filters the result by the given [autonomous region](http://www.ine.es/en/daco/daco42/codmun/cod_ccaa_en.htm) `id` separated by comma.
-
-```shell
-npm run prepare --es-atlas:autonomous_regions=09,10,14,04
-```
 
 ## File Reference
 
