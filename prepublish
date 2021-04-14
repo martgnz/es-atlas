@@ -10,11 +10,6 @@ SIMPLIFICATION=$npm_package_config_simplification
 QUANTIZATION=$npm_package_config_quantization
 AUTONOMOUS_REGIONS_IDS=$npm_package_config_autonomous_regions
 
-if [ "$npm_package_config_add_names" = true ]; then
-  echo "Adding names to the files"
-  NDJSONMAP_ARGS="(name = d.properties.NAMEUNIT, delete d.properties, d.properties={}, d.properties.name=name, d)"
-fi
-
 if [ $AUTONOMOUS_REGIONS_IDS != all ]; then
   NDJSONFILTER_ARGS="'${AUTONOMOUS_REGIONS_IDS}'.split(',').includes(d.properties.NATCODE.slice(2, 4))"
 
@@ -51,6 +46,7 @@ geo2topo -n autonomous_regions=<( \
       | ndjson-filter "$NDJSONFILTER_ARGS" \
       | ndjson-map '(d.id = d.properties.NATCODE.slice(2, 4), d)') \
   | toposimplify -f -p $SIMPLIFICATION \
+  | topoquantize $QUANTIZATION \
   | topomerge border=autonomous_regions \
   > es/autonomous_regions.json
 
@@ -62,8 +58,10 @@ geo2topo -n provinces=<( \
       | ndjson-filter "$NDJSONFILTER_ARGS" \
       | ndjson-map '(d.id = d.properties.NATCODE.slice(4, 6), d)') \
   | toposimplify -f -p $SIMPLIFICATION \
+  | topoquantize $QUANTIZATION \
   | topomerge autonomous_regions=provinces -k 'd.properties.NATCODE.slice(2, 4)' \
   | topomerge border=autonomous_regions \
+  | node ./properties.js \
   > es/provinces.json
 
 geo2topo -n municipalities=<( \
@@ -74,71 +72,9 @@ geo2topo -n municipalities=<( \
       | ndjson-filter "$NDJSONFILTER_ARGS" \
       | ndjson-map '(d.id = d.properties.NATCODE.slice(6, 11), d)') \
   | toposimplify -f -p $SIMPLIFICATION \
+  | topoquantize $QUANTIZATION \
   | topomerge provinces=municipalities -k 'd.properties.NATCODE.slice(4, 6)' \
   | topomerge autonomous_regions=municipalities -k 'd.properties.NATCODE.slice(2, 4)' \
   | topomerge border=autonomous_regions \
+  | node ./properties.js \
   > es/municipalities.json
-
-# Inspired by: https://bl.ocks.org/mbostock/39b34968ad5eab65de1d7da81f78bb27
-# Re-compute the topology as a further optimization.
-# This consolidates unique sequences of arcs.
-# https://github.com/topojson/topojson-simplify/issues/4
-
-topo2geo -n \
-  < es/autonomous_regions.json \
-  autonomous_regions=es/_autonomous_regions.json \
-  border=es/_border.json
-
-geo2topo -n \
-  autonomous_regions=<( \
-      cat es/_autonomous_regions.json \
-        | ndjson-map "$NDJSONMAP_ARGS") \
-  border=<( \
-      cat es/_border.json \
-        | ndjson-map "$NDJSONMAP_ARGS") \
-  | topoquantize $QUANTIZATION \
-  > es/autonomous_regions.json
-
-topo2geo -n \
-  < es/provinces.json \
-  provinces=es/_provinces.json
-
-geo2topo -n \
-  provinces=<( \
-      cat es/_provinces.json \
-        | ndjson-map "$NDJSONMAP_ARGS") \
-  autonomous_regions=<( \
-      cat es/_autonomous_regions.json \
-        | ndjson-map "$NDJSONMAP_ARGS") \
-  border=<( \
-      cat es/_border.json \
-        | ndjson-map "$NDJSONMAP_ARGS") \
-  | topoquantize $QUANTIZATION \
-  > es/provinces.json
-
-rm es/_provinces.json es/_autonomous_regions.json es/_border.json
-
-topo2geo -n \
-  < es/municipalities.json \
-  municipalities=es/_municipalities.json \
-  provinces=es/_provinces.json \
-  autonomous_regions=es/_autonomous_regions.json \
-  border=es/_border.json
-
-geo2topo -n \
-  municipalities=<( \
-      cat es/_municipalities.json \
-        | ndjson-map "$NDJSONMAP_ARGS") \
-  provinces=<( \
-      cat es/_provinces.json \
-        | ndjson-map "$NDJSONMAP_ARGS") \
-  autonomous_regions=<( \
-      cat es/_autonomous_regions.json \
-        | ndjson-map "$NDJSONMAP_ARGS") \
-  border=<( \
-      cat es/_border.json \
-        | ndjson-map "$NDJSONMAP_ARGS") \
-  | topoquantize $QUANTIZATION \
-  > es/municipalities.json
-
-rm es/_municipalities.json es/_provinces.json es/_autonomous_regions.json es/_border.json
