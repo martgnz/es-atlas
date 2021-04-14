@@ -18,7 +18,8 @@ const svg = d3.select("svg");
 const projection = d3.geoConicConformalSpain();
 const path = d3.geoPath(projection);
 
-d3.json("https://unpkg.com/es-atlas@0.3.1/es/municipalities.json")
+d3.json("https://unpkg.com/es-atlas/es/municipalities.json")
+  .catch(err => console.warn(err));
   .then(es => {
     svg
       .append('path')
@@ -32,8 +33,6 @@ d3.json("https://unpkg.com/es-atlas@0.3.1/es/municipalities.json")
       .attr('fill', 'none')
       .attr('stroke', 'black');
   })
-  .catch(err => console.warn(err));
-
 </script>
 ```
 
@@ -59,7 +58,7 @@ context.stroke();
 canvas.pngStream().pipe(fs.createWriteStream('preview.png'));
 ```
 
-I highly recommend using Roger Veciana’s [d3-composite-projections](https://github.com/rveciana/d3-composite-projections) with these files. Using a `ConicConformalSpain` projection will ensure that the Canary Islands are painted closer to the mainland and even [add a border](https://github.com/rveciana/d3-composite-projections#usage) to mark the projection zone.
+I highly recommend using Roger Veciana’s [d3-composite-projections](https://github.com/rveciana/d3-composite-projections) with these files. Using a `geoConicConformalSpain` projection will ensure that the Canary Islands are painted closer to the mainland and even [add a border](https://bl.ocks.org/rveciana/d635afded8c4eae36ecf61a15bdf0a98) to mark the projection zone.
 
 ## Generating the files
 
