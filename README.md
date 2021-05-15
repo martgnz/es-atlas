@@ -6,14 +6,16 @@ This repository provides a simple script to generate TopoJSON files from the [Sp
 
 ## Usage
 
-In a browser (using [d3-geo](https://github.com/d3/d3-geo) and SVG):
+You can see an interactive example in this [Observable notebook](https://observablehq.com/@martgnz/mapa-de-espana-con-topojson-y-es-atlas).
+
+For the browser with [d3-geo](https://github.com/d3/d3-geo) and SVG:
 
 ```html
 <!DOCTYPE html>
 <svg width="960" height="500"></svg>
 <script src="https://d3js.org/d3.v6.min.js"></script>
 <script src="https://d3js.org/topojson.v3.min.js"></script>
-<script src="https://unpkg.com/d3-composite-projections@1.4.0"></script>
+<script src="https://unpkg.com/d3-composite-projections@1.3.0"></script>
 <script>
 
 const svg = d3.select("svg");
