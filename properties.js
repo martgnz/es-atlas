@@ -4,23 +4,23 @@ const shapefile = require("shapefile");
 Promise.all([
   parseInput(),
   shapefile.read(
-    "build/recintos_autonomicas_inspire_canarias_wgs84.shp",
-    "build/recintos_autonomicas_inspire_canarias_wgs84.dbf",
+    "build/recintos_autonomicas_inspire_canarias_regcan95.shp",
+    "build/recintos_autonomicas_inspire_canarias_regcan95.dbf",
     { encoding: 'utf8' }
   ),
   shapefile.read(
-    "build/recintos_autonomicas_inspire_peninbal_etrs89.shp", 
-    "build/recintos_autonomicas_inspire_peninbal_etrs89.dbf", 
+    "build/recintos_autonomicas_inspire_peninbal_etrs89.shp",
+    "build/recintos_autonomicas_inspire_peninbal_etrs89.dbf",
     { encoding: 'utf8' }
   ),
   shapefile.read(
-    "build/recintos_provinciales_inspire_canarias_wgs84.shp", 
-    "build/recintos_provinciales_inspire_canarias_wgs84.dbf", 
+    "build/recintos_provinciales_inspire_canarias_regcan95.shp",
+    "build/recintos_provinciales_inspire_canarias_regcan95.dbf",
     { encoding: 'utf8' }
   ),
   shapefile.read(
     "build/recintos_provinciales_inspire_peninbal_etrs89.shp",
-    "build/recintos_provinciales_inspire_peninbal_etrs89.dbf", 
+    "build/recintos_provinciales_inspire_peninbal_etrs89.dbf",
     { encoding: 'utf8' }
   ),
 ]).then(output);
