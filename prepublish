@@ -31,7 +31,7 @@ mkdir -p es
 
 if [ ! -d build ]; then
   mkdir build
-  curl  "https://centrodedescargas.cnig.es/CentroDescargas/descargaDir" --compressed --data "secuencialDescDir=9000029&aceptCodsLicsDD_0=15" > build/lineas_limite.zip
+  curl "https://centrodedescargas.cnig.es/CentroDescargas/descargaDir" -k --compressed --data "secuencialDescDir=9000029&aceptCodsLicsDD_0=15" > build/lineas_limite.zip
   unzip -jod build build/lineas_limite.zip \
     SIGLIM_Publico_INSPIRE/\*/recintos_autonomicas\* \
     SIGLIM_Publico_INSPIRE/\*/recintos_provinciales\* \
