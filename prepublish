@@ -51,6 +51,7 @@ geo2topo -n autonomous_regions=<( \
   | toposimplify -f -p $SIMPLIFICATION \
   | topoquantize $QUANTIZATION \
   | topomerge border=autonomous_regions \
+  | node ./properties.js \
   > es/autonomous_regions.json
 
 geo2topo -n provinces=<( \
